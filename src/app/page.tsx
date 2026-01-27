@@ -61,7 +61,6 @@ const formatTime = (iso: string) => {
     hour: "numeric",
     minute: "2-digit",
     hour12: true,
-    timeZone: "America/New_York", // This forces the display to EST regardless of server location
   });
 };
 
@@ -113,7 +112,7 @@ export default async function Page() {
                 <ThermometerSun className="h-4 w-4" /> Local Forecast
               </CardTitle>
               <CardDescription className="text-blue-600/60 text-[10px] md:text-xs">
-                Updated: {weatherData?.fetchedAt || "N/A"}
+                Last Updated: {weatherData?.fetchedAt || "N/A"}
               </CardDescription>
             </div>
           </CardHeader>
@@ -179,14 +178,20 @@ export default async function Page() {
         {/* MAIN STOCK WIDGET (Bottom on Mobile, Right on Desktop) */}
         <Card className="md:col-span-8 border-2 border-primary/10 bg-card/50">
           <CardHeader className="pb-3">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-2">
-              <CardTitle className="text-xl md:text-2xl font-black flex items-center gap-2">
-                <Warehouse className="h-5 w-5 md:h-6 md:w-6 text-primary" />{" "}
-                Current Stock
-              </CardTitle>
-              <CardDescription className="text-[10px] md:text-sm">
-                Reported: {stock?.date || "No data available"}
-              </CardDescription>
+            {/* Added 'items-start' to keep everything aligned to the left */}
+            <div className="flex flex-row items-start justify-between gap-2">
+              {/* This wrapper div forces Title and Description to stack vertically */}
+              <div className="flex flex-col gap-1">
+                <CardTitle className="text-xl md:text-2xl font-black flex items-center gap-2">
+                  <Warehouse className="h-5 w-5 md:h-6 md:w-6 text-primary" />{" "}
+                  Current Stock
+                </CardTitle>
+                <CardDescription className="text-[10px] md:text-sm">
+                  Latest Report: {stock?.date || "No data available"}
+                </CardDescription>
+              </div>
+
+              {/* Optional: If you want to add a status badge or icon on the far right, it would go here */}
             </div>
           </CardHeader>
           <CardContent>
