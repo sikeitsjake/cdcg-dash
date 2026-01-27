@@ -30,12 +30,6 @@ const ALL_FORMS = [
     category: "Internal",
   },
   {
-    id: "req_time_off",
-    title: "Request Time Off",
-    desc: "Submit to request days off.",
-    category: "Internal",
-  },
-  {
     id: "crab_invoices",
     title: "Crab Invoice Entry",
     desc: "Log which docks are sending what.",
