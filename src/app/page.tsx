@@ -215,7 +215,7 @@ export default async function Page() {
                       {stock.totalMales}
                     </p>
                     <p className="text-[8px] md:text-[10px] text-muted-foreground font-bold">
-                      SM - SUPER
+                      ALL MALES
                     </p>
                   </div>
                   <div className="space-y-0.5">
@@ -226,7 +226,7 @@ export default async function Page() {
                       {stock.totalFemales}
                     </p>
                     <p className="text-[8px] md:text-[10px] text-muted-foreground font-bold">
-                      SM - LG
+                      ALL FEMALES
                     </p>
                   </div>
                   <div className="space-y-0.5 col-span-2 md:col-span-1 border-t md:border-t-0 pt-4 md:pt-0">
@@ -237,7 +237,7 @@ export default async function Page() {
                       {stock.totalBushels}
                     </p>
                     <p className="text-[8px] md:text-[10px] text-muted-foreground font-bold">
-                      TOTAL VOLUME
+                      ALL #1 Bushels
                     </p>
                   </div>
                 </div>
