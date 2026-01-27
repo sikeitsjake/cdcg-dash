@@ -25,7 +25,7 @@ import {
   CheckCircle2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { submitInvoicesToSheets } from "@/app/actions/crab-actions";
+import { submitInvoicesToSheets } from "@/lib/actions/crab-actions";
 
 type Entry = {
   id: string;

@@ -6,41 +6,40 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import {
-  Users,
   Sparkles,
   CloudSun,
-  ListTodo,
-  CheckCircle2,
-  AlertCircle,
   ThermometerSun,
-  Wind,
-  Activity,
-  Cloud,
   Sun,
+  Cloud,
   CloudRain,
   ArrowUp,
   ArrowDown,
   Sunrise,
   Sunset,
+  Warehouse,
 } from "lucide-react";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Badge } from "@/components/ui/badge";
-import { google } from "googleapis";
-import { Warehouse } from "lucide-react";
+import { getLatestStockData } from "@/lib/actions/crab-actions";
 
 const LAT = process.env.LAT;
 const LON = process.env.LON;
 
 async function getWeatherData() {
   try {
-    // Adding 'apparent_temperature' for feels like and 'daily' for high/low/sunset
     const res = await fetch(
       `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}&current=temperature_2m,apparent_temperature,weather_code,wind_speed_10m,relative_humidity_2m&daily=temperature_2m_max,temperature_2m_min,sunrise,sunset&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=auto`,
-      { next: { revalidate: 3600 } },
+      { next: { revalidate: 600 } },
     );
-    return await res.json();
+    const data = await res.json();
+    // Add a local timestamp for when this was fetched
+    return {
+      ...data,
+      fetchedAt: new Date().toLocaleTimeString([], {
+        hour: "numeric",
+        minute: "2-digit",
+      }),
+    };
   } catch (error) {
     console.error("Weather fetch failed:", error);
     return null;
@@ -54,7 +53,6 @@ function getWeatherDetails(code: number) {
   return { label: "Cloudy", icon: Cloud };
 }
 
-// Simple helper to format ISO strings like "2026-01-27T17:15" to "5:15 PM"
 const formatTime = (iso: string) => {
   return new Date(iso).toLocaleTimeString([], {
     hour: "numeric",
@@ -68,7 +66,11 @@ export default async function Page() {
 
   if (!session) redirect("/login");
 
-  const weatherData = await getWeatherData();
+  const [weatherData, stock] = await Promise.all([
+    getWeatherData(),
+    getLatestStockData(),
+  ]);
+
   const current = weatherData?.current;
   const daily = weatherData?.daily;
   const weatherDetail = current
@@ -76,15 +78,9 @@ export default async function Page() {
     : null;
   const WeatherIcon = weatherDetail?.icon || CloudSun;
 
-  const dailyTasks = [
-    { id: "1", task: "Calibrate Scales", done: true },
-    { id: "2", task: "Check Maryland 1's Inventory", done: false },
-    { id: "3", task: "Clean Steamer Trays", done: false },
-    { id: "4", task: "Finalize Tuesday Logistics", done: false },
-  ];
-
   return (
     <div className="flex flex-col gap-6 animate-in fade-in duration-700">
+      {/* HEADER CARD */}
       <Card className="bg-gradient-to-r from-blue-600/10 via-transparent to-transparent border-2 border-primary/10">
         <CardHeader className="flex flex-row items-center gap-5 py-8">
           <div className="h-16 w-16 flex items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-xl rotate-3">
@@ -102,12 +98,18 @@ export default async function Page() {
       </Card>
 
       <div className="grid gap-6 md:grid-cols-12">
-        {/* ENHANCED WEATHER WIDGET */}
+        {/* WEATHER WIDGET (Left Column) */}
         <Card className="md:col-span-4 border-2 border-blue-500/20 bg-blue-500/5">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-bold flex items-center gap-2 text-blue-600 dark:text-blue-400 uppercase">
-              <ThermometerSun className="h-4 w-4" /> Local Forecast
-            </CardTitle>
+            <div>
+              <CardTitle className="text-sm font-bold flex items-center gap-2 text-blue-600 dark:text-blue-400 uppercase">
+                <ThermometerSun className="h-4 w-4" /> Local Forecast
+              </CardTitle>
+              {/* Added to match Stock widget style */}
+              <CardDescription className="text-blue-600/60">
+                Weather last fetched at: {weatherData?.fetchedAt || "N/A"}
+              </CardDescription>
+            </div>
           </CardHeader>
           <CardContent>
             {current && daily ? (
@@ -167,80 +169,67 @@ export default async function Page() {
           </CardContent>
         </Card>
 
-        {/* DAILY TASKS */}
-        <Card className="md:col-span-8 border-2 border-primary/5">
+        {/* MAIN STOCK WIDGET (Right Column) */}
+        <Card className="md:col-span-8 border-2 border-primary/10 bg-card/50">
           <CardHeader className="pb-3 flex flex-row items-center justify-between">
             <div>
-              <CardTitle className="text-xl font-bold flex items-center gap-2">
-                <ListTodo className="h-5 w-5 text-primary" /> Today's Priorities
+              <CardTitle className="text-2xl font-black flex items-center gap-2">
+                <Warehouse className="h-6 w-6 text-primary" /> Current Stock
               </CardTitle>
               <CardDescription>
-                Store checks for {new Date().toLocaleDateString()}
+                Last reported count: {stock?.date || "No data available"}
               </CardDescription>
             </div>
-            <Badge variant="outline">
-              {dailyTasks.filter((t) => !t.done).length} Remaining
-            </Badge>
           </CardHeader>
-          <CardContent className="grid gap-3">
-            {dailyTasks.map((item) => (
-              <div
-                key={item.id}
-                className="flex items-center space-x-3 p-3 rounded-lg border bg-card/50"
-              >
-                <Checkbox id={item.id} checked={item.done} />
-                <label
-                  htmlFor={item.id}
-                  className={`text-sm font-medium ${item.done ? "line-through text-muted-foreground" : ""}`}
-                >
-                  {item.task}
-                </label>
+          <CardContent>
+            {stock ? (
+              <div className="flex flex-col gap-6">
+                <div className="flex items-baseline gap-2">
+                  <span className="text-7xl font-black tracking-tighter text-primary">
+                    {stock.totalMales + stock.totalFemales}
+                  </span>
+                  <span className="text-2xl font-bold text-muted-foreground uppercase">
+                    Dozens Total
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-3 gap-6 pt-6 border-t border-primary/5">
+                  <div className="space-y-1">
+                    <p className="text-xs font-black text-blue-600 uppercase tracking-widest">
+                      Males
+                    </p>
+                    <p className="text-4xl font-black">{stock.totalMales}</p>
+                    <p className="text-[10px] text-muted-foreground font-bold">
+                      SM - SUPER
+                    </p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-xs font-black text-pink-600 uppercase tracking-widest">
+                      Females
+                    </p>
+                    <p className="text-4xl font-black">{stock.totalFemales}</p>
+                    <p className="text-[10px] text-muted-foreground font-bold">
+                      SM - LG
+                    </p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-xs font-black text-orange-600 uppercase tracking-widest">
+                      Bushels
+                    </p>
+                    <p className="text-4xl font-black">{stock.totalBushels}</p>
+                    <p className="text-[10px] text-muted-foreground font-bold">
+                      TOTAL VOLUME
+                    </p>
+                  </div>
+                </div>
               </div>
-            ))}
+            ) : (
+              <div className="py-20 text-center text-muted-foreground font-bold uppercase tracking-widest">
+                Waiting for inventory report...
+              </div>
+            )}
           </CardContent>
         </Card>
-      </div>
-
-      {/* STATS GRID */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {[
-          {
-            title: "Active Staff",
-            val: "6",
-            icon: Users,
-            color: "text-green-500",
-          },
-          {
-            title: "Inventory",
-            val: "Stocked",
-            icon: CheckCircle2,
-            color: "text-blue-500",
-          },
-          {
-            title: "Invoices",
-            val: "3",
-            icon: AlertCircle,
-            color: "text-orange-500",
-          },
-          {
-            title: "Logins",
-            val: "12",
-            icon: Activity,
-            color: "text-purple-500",
-          },
-        ].map((item, i) => (
-          <Card key={i} className="hover:border-primary/50 transition-colors">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-xs font-bold uppercase text-muted-foreground">
-                {item.title}
-              </CardTitle>
-              <item.icon className={`h-4 w-4 ${item.color}`} />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-black">{item.val}</div>
-            </CardContent>
-          </Card>
-        ))}
       </div>
     </div>
   );

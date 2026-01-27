@@ -25,7 +25,7 @@ import {
   Loader2,
   DollarSign,
 } from "lucide-react";
-import { submitEoDBreakdownToSheets } from "@/app/actions/crab-actions";
+import { submitEoDBreakdownToSheets } from "@/lib/actions/crab-actions";
 
 export default function EoDSalesBreakdown() {
   const [isPending, setIsPending] = useState(false);

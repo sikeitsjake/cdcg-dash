@@ -183,3 +183,39 @@ export async function submitTuesdayLogToSheets(formData: FormData) {
     return { success: false, error: "Submission failed" };
   }
 }
+
+// FUNCTION CALLED BY HOME.TSX
+export async function getLatestStockData() {
+  try {
+    const sheets = await getGoogleSheetClient();
+    const spreadsheetId = process.env.GOOGLE_SHEET_ID;
+
+    // Fetch the range covering Date (A) through Bushels (Q)
+    const response = await sheets.spreadsheets.values.get({
+      spreadsheetId,
+      range: "EoD_Data!A:Q",
+    });
+
+    const rows = response.data.values;
+    if (!rows || rows.length <= 1) return null;
+
+    const latestRow = rows[rows.length - 1];
+
+    // Helper to sum numeric strings in a range
+    const sumRange = (start: number, end: number) => {
+      return latestRow.slice(start, end + 1).reduce((acc, val) => {
+        return acc + (Number(val) || 0);
+      }, 0);
+    };
+
+    return {
+      totalMales: sumRange(5, 11), // Columns F-L
+      totalFemales: sumRange(12, 15), // Columns M-P
+      totalBushels: latestRow[16] || "0", // Column Q
+      date: latestRow[0],
+    };
+  } catch (error) {
+    console.error("Stock Fetch Error:", error);
+    return null;
+  }
+}

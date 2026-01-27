@@ -15,7 +15,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ClipboardCheck, Loader2, CheckCircle2 } from "lucide-react";
-import { submitTuesdayLogToSheets } from "@/app/actions/crab-actions";
+import { submitTuesdayLogToSheets } from "@/lib/actions/crab-actions";
 
 // Define the prop type for the initial worker name
 interface TuesdayBreakdownProps {
