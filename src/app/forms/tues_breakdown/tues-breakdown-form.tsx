@@ -31,7 +31,7 @@ export default function TuesdayBreakdown({
   const [isPending, setIsPending] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
-  const WORKER_LIST = ["Alex", "Brandon", "Jake", "Josh", "Steve"];
+  const WORKER_LIST = ["Alex", "Brandon", "Jake", "Josh", "Steve", "Guest"];
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
