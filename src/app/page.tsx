@@ -37,7 +37,6 @@ async function getWeatherData() {
       fetchedAt: new Date().toLocaleTimeString([], {
         hour: "numeric",
         minute: "2-digit",
-        timeZone: "America/New_York",
       }),
     };
   } catch (error) {
