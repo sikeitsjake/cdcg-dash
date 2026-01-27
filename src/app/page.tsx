@@ -81,7 +81,7 @@ export default async function Page() {
   const WeatherIcon = weatherDetail?.icon || CloudSun;
 
   return (
-    <div className="flex flex-col gap-6 animate-in fade-in duration-700">
+    <div className="flex flex-col gap-6 animate-in fade-in duration-700 fill-mode-forwards will-change-transform">
       {/* HEADER CARD */}
       <Card className="bg-gradient-to-r from-blue-600/10 via-transparent to-transparent border-2 border-primary/10">
         <CardHeader className="flex flex-row items-center gap-5 py-8">
