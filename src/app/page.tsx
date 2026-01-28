@@ -17,6 +17,7 @@ import {
   Sunrise,
   Sunset,
   Warehouse,
+  Clock,
 } from "lucide-react";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
@@ -54,9 +55,7 @@ function getWeatherDetails(code: number) {
 }
 
 const formatTime = (iso: string) => {
-  // Ensure the date is treated as a specific point in time
   const date = new Date(iso);
-
   return date.toLocaleTimeString("en-US", {
     hour: "numeric",
     minute: "2-digit",
@@ -64,6 +63,51 @@ const formatTime = (iso: string) => {
   });
 };
 
+// Logic to determine employee start time based on inventory volume
+function getStartTime(totalDozens: number, currentDay: string) {
+  const weekDays = ["Wednesday", "Thursday", "Friday"];
+  const weekendDays = ["Saturday", "Sunday"];
+
+  // 1. Quick exit for closed days
+  if (currentDay === "Monday" || currentDay === "Tuesday") return "Closed";
+
+  // 2. Identify the starting hour (12 PM for weekdays, 9 AM for weekends)
+  let baseHour;
+  if (weekDays.includes(currentDay)) {
+    baseHour = 12;
+  } else if (weekendDays.includes(currentDay)) {
+    baseHour = 9;
+  } else {
+    return "N/A"; // Fallback for unknown days
+  }
+
+  // Formatting functions that format 24hr time -> 12hr time.
+  const format12h = (h: number) => (h > 12 ? h - 12 : h);
+  const getSuffix = (h: number) => (h >= 12 ? " PM" : " AM");
+
+  // 3. One logic path for all volumes
+  if (totalDozens >= 300)
+    return `${format12h(baseHour)}:00${getSuffix(baseHour)}`;
+  if (totalDozens >= 250)
+    return `${format12h(baseHour)}:30${getSuffix(baseHour)}`;
+  if (totalDozens >= 200)
+    return `${format12h(baseHour)}:45${getSuffix(baseHour)}`;
+
+  // For lower volumes (+1 hour)
+  const hourPlus1 = baseHour + 1;
+  if (totalDozens >= 150)
+    return `${format12h(hourPlus1)}:00${getSuffix(hourPlus1)}`;
+  if (totalDozens >= 100)
+    return `${format12h(hourPlus1)}:30${getSuffix(hourPlus1)}`;
+  if (totalDozens >= 90)
+    return `${format12h(hourPlus1)}:45${getSuffix(hourPlus1)}`;
+
+  // Default (+2 hours)
+  const hourPlus2 = baseHour + 2;
+  return `${format12h(hourPlus2)}:00${getSuffix(hourPlus2)}`;
+}
+
+// COMPONENT
 export default async function Page() {
   const cookieStore = await cookies();
   const session = cookieStore.get("session");
@@ -75,6 +119,13 @@ export default async function Page() {
     getLatestStockData(),
   ]);
 
+  // 2. Define your "Global" Time Reference for this request
+  const now = new Date();
+  const todayEST = new Intl.DateTimeFormat("en-US", {
+    weekday: "long",
+    timeZone: "America/New_York",
+  }).format(now);
+
   const current = weatherData?.current;
   const daily = weatherData?.daily;
   const weatherDetail = current
@@ -82,10 +133,12 @@ export default async function Page() {
     : null;
   const WeatherIcon = weatherDetail?.icon || CloudSun;
 
+  const totalDozens = stock ? stock.totalMales + stock.totalFemales : 0;
+  const recommendedStartTime = getStartTime(totalDozens, todayEST);
+
   return (
-    /* Removed high-level animation to fix mobile scroll bumping */
     <div className="flex flex-col gap-4 md:gap-6 p-4 md:p-0 transition-opacity duration-500 ease-in">
-      {/* HEADER CARD - Optimized for mobile font scaling */}
+      {/* HEADER CARD */}
       <Card className="bg-gradient-to-r from-blue-600/10 via-transparent to-transparent border-2 border-primary/10 overflow-hidden">
         <CardHeader className="flex flex-row items-center gap-4 md:gap-5 py-6 md:py-8">
           <div className="h-12 w-12 md:h-16 md:w-16 flex items-center justify-center rounded-xl md:rounded-2xl bg-primary text-primary-foreground shadow-xl shrink-0">
@@ -103,8 +156,44 @@ export default async function Page() {
         </CardHeader>
       </Card>
 
+      {/* REFINED EMPLOYEE SCHEDULE BANNER */}
+      <Card className="border-2 border-primary/10 bg-card/50 shadow-sm overflow-hidden">
+        {/* TITLE SECTION */}
+        <div className="px-6 py-1.5 border-b border-primary/5 bg-primary/5">
+          <p className="text-[10px] font-black uppercase tracking-widest text-primary/70">
+            Estimated Back of House Clock in Time
+          </p>
+        </div>
+
+        {/* CONTENT SECTION */}
+        <div className="px-6 py-2 flex flex-col md:flex-row md:items-center justify-between gap-2">
+          <div className="flex items-center gap-3">
+            <div className="bg-primary/10 p-1.5 rounded-lg">
+              <Clock className="h-4 w-4 text-primary" />
+            </div>
+            <div>
+              <p className="text-muted-foreground text-[9px] font-bold uppercase tracking-widest">
+                Estimated Total Dozen
+              </p>
+              <h2 className="text-foreground text-sm md:text-base font-black">
+                {totalDozens} Dozens Total
+              </h2>
+            </div>
+          </div>
+
+          <div className="flex flex-row md:flex-col items-center md:items-end gap-2 md:gap-0 border-t md:border-t-0 pt-2 md:pt-0 border-primary/5">
+            <p className="text-muted-foreground text-[9px] font-bold uppercase">
+              Estimated Clock In Time:
+            </p>
+            <p className="text-primary text-lg md:text-xl font-black">
+              {recommendedStartTime}
+            </p>
+          </div>
+        </div>
+      </Card>
+
       <div className="grid gap-4 md:gap-6 md:grid-cols-12">
-        {/* WEATHER WIDGET (Top on Mobile, Left on Desktop) */}
+        {/* WEATHER WIDGET */}
         <Card className="md:col-span-4 border-2 border-blue-500/20 bg-blue-500/5">
           <CardHeader className="pb-2">
             <div>
@@ -175,12 +264,10 @@ export default async function Page() {
           </CardContent>
         </Card>
 
-        {/* MAIN STOCK WIDGET (Bottom on Mobile, Right on Desktop) */}
+        {/* MAIN STOCK WIDGET */}
         <Card className="md:col-span-8 border-2 border-primary/10 bg-card/50">
           <CardHeader className="pb-3">
-            {/* Added 'items-start' to keep everything aligned to the left */}
             <div className="flex flex-row items-start justify-between gap-2">
-              {/* This wrapper div forces Title and Description to stack vertically */}
               <div className="flex flex-col gap-1">
                 <CardTitle className="text-xl md:text-2xl font-black flex items-center gap-2">
                   <Warehouse className="h-5 w-5 md:h-6 md:w-6 text-primary" />{" "}
@@ -190,8 +277,6 @@ export default async function Page() {
                   Latest Report: {stock?.date || "No data available"}
                 </CardDescription>
               </div>
-
-              {/* Optional: If you want to add a status badge or icon on the far right, it would go here */}
             </div>
           </CardHeader>
           <CardContent>
@@ -199,14 +284,13 @@ export default async function Page() {
               <div className="flex flex-col gap-4 md:gap-6">
                 <div className="flex items-baseline gap-2">
                   <span className="text-5xl md:text-7xl font-black tracking-tighter text-primary">
-                    {stock.totalMales + stock.totalFemales}
+                    {totalDozens}
                   </span>
                   <span className="text-sm md:text-2xl font-bold text-muted-foreground uppercase">
                     Dozens Total
                   </span>
                 </div>
 
-                {/* Adjusted grid for better mobile spacing */}
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 pt-6 border-t border-primary/5">
                   <div className="space-y-0.5">
                     <p className="text-[9px] md:text-xs font-black text-blue-600 uppercase tracking-widest">
