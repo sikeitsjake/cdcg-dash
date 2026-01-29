@@ -40,7 +40,7 @@ export default function RootLayout({
               <header className="flex h-12 items-center px-4 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 dark:border-zinc-800">
                 <SidebarTrigger />
                 <div className="ml-4 font-semibold text-sm tracking-tight">
-                  Captain Dick's Dashboard
+                  {`Captain Dick's Dashboard`}
                 </div>
               </header>
 
