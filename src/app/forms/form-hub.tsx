@@ -46,7 +46,7 @@ export default function FormsPage({ userName }: FormsPageProps) {
   );
 
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col gap-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
       {/* Header & Search Area */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
@@ -71,8 +71,13 @@ export default function FormsPage({ userName }: FormsPageProps) {
 
       {/* Forms Grid */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {filteredForms.map((form) => (
-          <Link key={form.id} href={`/forms/${form.id}`}>
+        {filteredForms.map((form, index) => (
+          <Link
+            key={form.id}
+            href={`/forms/${form.id}`}
+            className="animate-in fade-in zoom-in-95 duration-500 fill-mode-both"
+            style={{ animationDelay: `${index * 50}ms` }}
+          >
             <Card className="hover:border-primary transition-colors cursor-pointer group h-full">
               <CardHeader>
                 <div className="flex items-center justify-between mb-2">
