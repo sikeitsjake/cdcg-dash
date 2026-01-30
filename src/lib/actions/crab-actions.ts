@@ -2,20 +2,27 @@
 
 import { getGoogleSheetClient } from "@/lib/googleSheets";
 
+// This function ensures every time you call it, you get the CURRENT
+// time in Eastern, formatted for your Sheets.
+const getGlobalDate = () =>
+  new Date().toLocaleDateString("en-US", {
+    timeZone: "America/New_York",
+    month: "2-digit",
+    day: "2-digit",
+    year: "numeric",
+  });
+
 // FUNCTION CALLED BY CRAB_INVOICES.TSX
 export async function submitInvoicesToSheets(entries: any[]) {
   try {
     const sheets = await getGoogleSheetClient();
     const spreadsheetId = process.env.GOOGLE_SHEET_ID;
+    const date = getGlobalDate();
 
     // Transform our array of objects into a 2D array (Rows and Columns)
     // Column order: Timestamp, Type, Distributor, Ones, Twos, Females, ID
     const rows = entries.map((entry) => [
-      new Date().toLocaleString("en-US", {
-        month: "2-digit",
-        day: "2-digit",
-        year: "numeric",
-      }), // Timestamp
+      date,
       entry.type,
       entry.distributor,
       entry.ones,
@@ -46,6 +53,7 @@ export async function submitEoDBreakdownToSheets(formData: FormData) {
   try {
     const sheets = await getGoogleSheetClient();
     const spreadsheetId = process.env.GOOGLE_SHEET_ID;
+    const date = getGlobalDate();
 
     // 1. Extract values and normalize
     const rawData = Object.fromEntries(formData.entries());
@@ -74,7 +82,7 @@ export async function submitEoDBreakdownToSheets(formData: FormData) {
 
     // 2. Map data (using lowercase keys)
     const row = [
-      new Date().toLocaleDateString(),
+      date,
       data["time-closed"] || "N/A",
       data["weather-val"], // Now defaults to 0
       data["weather-condition"] || "N/A",
@@ -131,6 +139,7 @@ export async function submitTuesdayLogToSheets(formData: FormData) {
   try {
     const sheets = await getGoogleSheetClient();
     const spreadsheetId = process.env.GOOGLE_SHEET_ID;
+    const date = getGlobalDate();
 
     const rawData = Object.fromEntries(formData.entries());
 
@@ -142,7 +151,7 @@ export async function submitTuesdayLogToSheets(formData: FormData) {
     }
 
     const row = [
-      new Date().toLocaleDateString(),
+      date,
       data["worker-name"],
       // Maryland
       data["md-1s"],

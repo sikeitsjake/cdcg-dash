@@ -24,6 +24,8 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import { getLatestStockData } from "@/lib/actions/crab-actions";
+import { format } from "date-fns";
+import { Badge } from "@/components/ui/badge";
 
 // --- HELPERS (Kept exactly as is) ---
 const LAT = process.env.LAT;
@@ -63,30 +65,59 @@ const formatTime = (iso: string) =>
     hour12: true,
   });
 
-function getStartTime(totalDozens: number, currentDay: string) {
+function getStartTime(totalDozens: number, dateContext: Date = new Date()) {
+  // 1. Convert to Eastern Time to ensure server/client consistency
+  const estDate = new Date(
+    dateContext.toLocaleString("en-US", { timeZone: "America/New_York" }),
+  );
+  const currentHour = estDate.getHours();
+
+  // 2. Determine if we are looking at "Today" or "Tomorrow"
+  // If it's after 5 PM (17:00), we are estimating for the NEXT day.
+  const targetDate = new Date(estDate);
+  if (currentHour >= 17) {
+    targetDate.setDate(targetDate.getDate() + 1);
+  }
+
+  const dayName = format(targetDate, "EEEE"); // e.g., "Saturday"
   const weekDays = ["Wednesday", "Thursday", "Friday"];
   const weekendDays = ["Saturday", "Sunday"];
-  if (currentDay === "Monday" || currentDay === "Tuesday") return "Closed";
-  let baseHour = weekDays.includes(currentDay)
-    ? 12
-    : weekendDays.includes(currentDay)
-      ? 9
-      : 0;
-  if (!baseHour) return "N/A";
-  const format12h = (h: number) => (h > 12 ? h - 12 : h);
+
+  // 3. Handle Closed Days
+  if (dayName === "Monday" || dayName === "Tuesday")
+    return { time: "Closed", forDay: dayName };
+
+  // 4. Set Base Hour based on the TARGET day
+  let baseHour = 0;
+  if (weekDays.includes(dayName)) baseHour = 12; // Weekdays start at 12 PM
+  if (weekendDays.includes(dayName)) baseHour = 9; // Weekends start at 9 AM
+
+  if (baseHour === 0) return { time: "N/A", forDay: dayName };
+
+  // 5. Calculate Offset based on Volume
+  const format12h = (h: number) => (h > 12 ? h - 12 : h === 0 ? 12 : h);
   const getSuffix = (h: number) => (h >= 12 ? " PM" : " AM");
+
+  let finalTime = "";
   if (totalDozens >= 300)
-    return `${format12h(baseHour)}:00${getSuffix(baseHour)}`;
-  if (totalDozens >= 250)
-    return `${format12h(baseHour)}:30${getSuffix(baseHour)}`;
-  if (totalDozens >= 200)
-    return `${format12h(baseHour)}:45${getSuffix(baseHour)}`;
-  const h1 = baseHour + 1;
-  if (totalDozens >= 150) return `${format12h(h1)}:00${getSuffix(h1)}`;
-  if (totalDozens >= 100) return `${format12h(h1)}:30${getSuffix(h1)}`;
-  if (totalDozens >= 90) return `${format12h(h1)}:45${getSuffix(h1)}`;
-  const h2 = baseHour + 2;
-  return `${format12h(h2)}:00${getSuffix(h2)}`;
+    finalTime = `${format12h(baseHour)}:00${getSuffix(baseHour)}`;
+  else if (totalDozens >= 250)
+    finalTime = `${format12h(baseHour)}:30${getSuffix(baseHour)}`;
+  else if (totalDozens >= 200)
+    finalTime = `${format12h(baseHour)}:45${getSuffix(baseHour)}`;
+  else if (totalDozens >= 150)
+    finalTime = `${format12h(baseHour + 1)}:00${getSuffix(baseHour + 1)}`;
+  else if (totalDozens >= 100)
+    finalTime = `${format12h(baseHour + 1)}:30${getSuffix(baseHour + 1)}`;
+  else if (totalDozens >= 50)
+    finalTime = `${format12h(baseHour + 1)}:45${getSuffix(baseHour + 1)}`;
+  else finalTime = `${format12h(baseHour + 2)}:00${getSuffix(baseHour + 2)}`;
+
+  return {
+    time: finalTime,
+    forDay: dayName,
+    isTomorrow: targetDate.getDate() !== estDate.getDate(),
+  };
 }
 
 // --- SUB-COMPONENTS FOR STREAMING ---
@@ -168,19 +199,30 @@ async function WeatherWidget() {
   );
 }
 
-async function StockAndScheduleSection({ todayEST }: { todayEST: string }) {
+async function StockAndScheduleSection({
+  currentServerDate,
+}: {
+  currentServerDate: Date;
+}) {
   const stock = await getLatestStockData();
   const totalDozens = stock ? stock.totalMales + stock.totalFemales : 0;
-  const recommendedStartTime = getStartTime(totalDozens, todayEST);
+  const recommendedStartTime = getStartTime(totalDozens, currentServerDate);
 
   return (
     <>
       {/* Schedule Banner */}
       <Card className="border-2 border-primary/10 bg-card/50 shadow-sm overflow-hidden animate-in fade-in duration-500">
-        <div className="px-6 py-1.5 border-b border-primary/5 bg-primary/5">
+        <div className="px-6 py-1.5 border-b border-primary/5 bg-primary/5 flex justify-between items-center">
           <p className="text-[10px] font-black uppercase tracking-widest text-primary/70">
             Estimated Back of House Clock in Time
           </p>
+          {/* Label indicating if this is for tomorrow */}
+          <Badge
+            variant="outline"
+            className="text-[9px] h-4 border-primary/20 bg-primary/5 text-primary"
+          >
+            {recommendedStartTime.isTomorrow ? "Tomorrow" : "Today"}
+          </Badge>
         </div>
         <div className="px-6 py-2 flex flex-col md:flex-row md:items-center justify-between gap-2">
           <div className="flex items-center gap-3">
@@ -192,7 +234,7 @@ async function StockAndScheduleSection({ todayEST }: { todayEST: string }) {
                 Estimated Total Dozen
               </p>
               <h2 className="text-foreground text-sm md:text-base font-black">
-                {totalDozens} Dozens Total
+                {totalDozens} Dozens to Run
               </h2>
             </div>
           </div>
@@ -201,7 +243,7 @@ async function StockAndScheduleSection({ todayEST }: { todayEST: string }) {
               Estimated Clock In Time:
             </p>
             <p className="text-primary text-lg md:text-xl font-black">
-              {recommendedStartTime}
+              {recommendedStartTime.time}
             </p>
           </div>
         </div>
@@ -298,10 +340,6 @@ export default async function Page() {
   if (!session) redirect("/login");
 
   const now = new Date();
-  const todayEST = new Intl.DateTimeFormat("en-US", {
-    weekday: "long",
-    timeZone: "America/New_York",
-  }).format(now);
 
   return (
     <div className="flex flex-col gap-4 md:gap-6 p-4 md:p-0 animate-in slide-in-from-bottom-4 duration-700">
@@ -325,7 +363,7 @@ export default async function Page() {
 
       {/* STREAMED CONTENT */}
       <Suspense fallback={<StockFallback />}>
-        <StockAndScheduleSection todayEST={todayEST} />
+        <StockAndScheduleSection currentServerDate={now} />
       </Suspense>
     </div>
   );
