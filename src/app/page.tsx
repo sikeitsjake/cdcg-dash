@@ -245,7 +245,7 @@ async function StockAndScheduleSection({
           <div className="grid grid-cols-2 gap-4 p-4 rounded-xl border bg-card text-card-foreground shadow-sm flex-1">
             <div className="space-y-1">
               <p className="text-muted-foreground text-[10px] font-bold uppercase tracking-widest">
-                Estimated Dozens
+                Estimated Dozens to Run
               </p>
               <h2 className="text-foreground text-lg font-black leading-none">
                 {totalDozens}{" "}
