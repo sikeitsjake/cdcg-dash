@@ -157,7 +157,7 @@ export default function EoDSalesBreakdown() {
           </Card>
         </div>
 
-        {/* 2. End of Day Counts - REFACTORED FOR ROW SEPARATION */}
+        {/* 2. End of Day Counts*/}
         <Card className="border-2 border-primary/10 bg-card/50 backdrop-blur-sm">
           <CardHeader>
             <CardTitle className="text-lg font-bold flex items-center gap-2">
@@ -185,7 +185,7 @@ export default function EoDSalesBreakdown() {
                       type="number"
                       step="0.5"
                       placeholder="0.0"
-                      className="h-9 bg-background/50 border-blue-500/20 shadow-sm"
+                      className="h-9 bg-background/50 border-blue-500/20 shadow-sm focus-visible:ring-blue-500"
                     />
                   </div>
                 ))}
@@ -220,18 +220,33 @@ export default function EoDSalesBreakdown() {
 
             <Separator className="bg-primary/10" />
 
-            {/* Bushels Section */}
-            <div className="grid max-w-xs gap-2">
-              <Label className="text-blue-500 font-bold">
-                #1 Bushels Remaining
-              </Label>
-              <Input
-                name="eod-bushels"
-                type="number"
-                step="0.5"
-                placeholder="0.0"
-                className="bg-background/50 border-blue-500/30 font-mono"
-              />
+            {/* Bushels & Ungraded Section */}
+            <div className="grid grid-cols-2 max-w-md gap-4">
+              <div className="space-y-2">
+                <Label className="text-blue-500 font-bold">
+                  #1 Bushels Remaining
+                </Label>
+                <Input
+                  name="eod-bushels"
+                  type="number"
+                  step="0.5"
+                  placeholder="0.0"
+                  className="bg-background/50 border-blue-500/30 focus-visible:ring-blue-500"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-amber-600 font-bold">
+                  Ungraded Boxes
+                </Label>
+                <Input
+                  name="eod-ungraded-boxes"
+                  type="number"
+                  step="1"
+                  placeholder="0"
+                  className="bg-background/50 border-amber-500/30 focus-visible:ring-amber-500"
+                />
+              </div>
             </div>
           </CardContent>
         </Card>

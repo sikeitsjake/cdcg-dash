@@ -24,7 +24,7 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import { getLatestStockData } from "@/lib/actions/crab-actions";
-import { format } from "date-fns";
+import { format, subMinutes, setHours, setMinutes } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 
 // --- HELPERS (Kept exactly as is) ---
@@ -46,7 +46,7 @@ async function getWeatherData() {
         timeZone: "America/New_York",
       }),
     };
-  } catch (error) {
+  } catch (e) {
     return null;
   }
 }
@@ -65,58 +65,69 @@ const formatTime = (iso: string) =>
     hour12: true,
   });
 
-function getStartTime(totalDozens: number, dateContext: Date = new Date()) {
-  // 1. Convert to Eastern Time to ensure server/client consistency
+function getStartTime(
+  totalDozens: number,
+  ungradedBoxes: number,
+  dateContext: Date = new Date(),
+) {
+  // 1. Consistency: Convert to Eastern Time
   const estDate = new Date(
     dateContext.toLocaleString("en-US", { timeZone: "America/New_York" }),
   );
   const currentHour = estDate.getHours();
 
-  // 2. Determine if we are looking at "Today" or "Tomorrow"
-  // If it's after 5 PM (17:00), we are estimating for the NEXT day.
+  // 2. Target Day Logic
   const targetDate = new Date(estDate);
   if (currentHour >= 17) {
     targetDate.setDate(targetDate.getDate() + 1);
   }
 
-  const dayName = format(targetDate, "EEEE"); // e.g., "Saturday"
+  const dayName = format(targetDate, "EEEE");
   const weekDays = ["Wednesday", "Thursday", "Friday"];
   const weekendDays = ["Saturday", "Sunday"];
 
-  // 3. Handle Closed Days
   if (dayName === "Monday" || dayName === "Tuesday")
     return { time: "Closed", forDay: dayName };
 
-  // 4. Set Base Hour based on the TARGET day
-  let baseHour = 0;
-  if (weekDays.includes(dayName)) baseHour = 12; // Weekdays start at 12 PM
-  if (weekendDays.includes(dayName)) baseHour = 9; // Weekends start at 9 AM
+  // 3. Set LATEST Start Time (The "Baseline")
+  // We'll calculate BACKWARDS from 2 hours after the opening base hour
+  let latestHour = 0;
+  if (weekDays.includes(dayName)) latestHour = 14; // 2:00 PM (12PM + 2hrs)
+  if (weekendDays.includes(dayName)) latestHour = 11; // 11:00 AM (9AM + 2hrs)
 
-  if (baseHour === 0) return { time: "N/A", forDay: dayName };
+  if (latestHour === 0) return { time: "N/A", forDay: dayName };
 
-  // 5. Calculate Offset based on Volume
-  const format12h = (h: number) => (h > 12 ? h - 12 : h === 0 ? 12 : h);
-  const getSuffix = (h: number) => (h >= 12 ? " PM" : " AM");
+  // 4. Calculate Total Work Minutes
+  // 5 mins per 8.5 dozen
+  const dozenMinutes = (totalDozens / 8.5) * 5;
+  // 5 mins per ungraded box
+  const boxMinutes = ungradedBoxes * 5;
 
-  let finalTime = "";
-  if (totalDozens >= 300)
-    finalTime = `${format12h(baseHour)}:00${getSuffix(baseHour)}`;
-  else if (totalDozens >= 250)
-    finalTime = `${format12h(baseHour)}:30${getSuffix(baseHour)}`;
-  else if (totalDozens >= 200)
-    finalTime = `${format12h(baseHour)}:45${getSuffix(baseHour)}`;
-  else if (totalDozens >= 150)
-    finalTime = `${format12h(baseHour + 1)}:00${getSuffix(baseHour + 1)}`;
-  else if (totalDozens >= 100)
-    finalTime = `${format12h(baseHour + 1)}:30${getSuffix(baseHour + 1)}`;
-  else if (totalDozens >= 50)
-    finalTime = `${format12h(baseHour + 1)}:45${getSuffix(baseHour + 1)}`;
-  else finalTime = `${format12h(baseHour + 2)}:00${getSuffix(baseHour + 2)}`;
+  const totalWorkMinutes = dozenMinutes + boxMinutes;
+
+  // 5. Apply Math to the Baseline
+  // We start at the "Latest" time and subtract the work required
+  const calculationTime = setMinutes(
+    setHours(new Date(targetDate), latestHour),
+    0,
+  );
+  const finalClockIn = subMinutes(calculationTime, totalWorkMinutes);
+
+  // 6. Rounding to nearest 5 or 15 minutes (Optional but looks cleaner)
+  // Let's round to the nearest 5-minute increment
+  const minutes = finalClockIn.getMinutes();
+  const roundedMinutes = Math.round(minutes / 5) * 5;
+  finalClockIn.setMinutes(roundedMinutes);
 
   return {
-    time: finalTime,
+    time: format(finalClockIn, "h:mm a"),
     forDay: dayName,
     isTomorrow: targetDate.getDate() !== estDate.getDate(),
+    stats: {
+      dozenMins: Math.round(dozenMinutes),
+      boxMins: boxMinutes,
+      totalWorkLoad: Math.round(totalWorkMinutes),
+    },
   };
 }
 
@@ -206,7 +217,12 @@ async function StockAndScheduleSection({
 }) {
   const stock = await getLatestStockData();
   const totalDozens = stock ? stock.totalMales + stock.totalFemales : 0;
-  const recommendedStartTime = getStartTime(totalDozens, currentServerDate);
+  const ungradedBoxes = stock ? stock.ungraded : 0;
+  const recommendedStartTime = getStartTime(
+    totalDozens,
+    ungradedBoxes,
+    currentServerDate,
+  );
 
   return (
     <>
@@ -216,7 +232,6 @@ async function StockAndScheduleSection({
           <p className="text-[10px] font-black uppercase tracking-widest text-primary/70">
             Estimated Back of House Clock in Time
           </p>
-          {/* Label indicating if this is for tomorrow */}
           <Badge
             variant="outline"
             className="text-[9px] h-4 border-primary/20 bg-primary/5 text-primary"
@@ -224,27 +239,46 @@ async function StockAndScheduleSection({
             {recommendedStartTime.isTomorrow ? "Tomorrow" : "Today"}
           </Badge>
         </div>
-        <div className="px-6 py-2 flex flex-col md:flex-row md:items-center justify-between gap-2">
-          <div className="flex items-center gap-3">
-            <div className="bg-primary/10 p-1.5 rounded-lg">
-              <Clock className="h-4 w-4 text-primary" />
-            </div>
-            <div>
-              <p className="text-muted-foreground text-[9px] font-bold uppercase tracking-widest">
-                Estimated Total Dozen
+
+        <div className="px-6 py-4 flex flex-col md:flex-row md:items-center justify-between gap-6">
+          {/* Stats Group */}
+          <div className="grid grid-cols-2 gap-4 p-4 rounded-xl border bg-card text-card-foreground shadow-sm flex-1">
+            <div className="space-y-1">
+              <p className="text-muted-foreground text-[10px] font-bold uppercase tracking-widest">
+                Estimated Dozens
               </p>
-              <h2 className="text-foreground text-sm md:text-base font-black">
-                {totalDozens} Dozens to Run
+              <h2 className="text-foreground text-lg font-black leading-none">
+                {totalDozens}{" "}
+                <span className="text-xs font-medium text-muted-foreground">
+                  Dozens
+                </span>
+              </h2>
+            </div>
+            <div className="space-y-1 border-l pl-4">
+              <p className="text-muted-foreground text-[10px] font-bold uppercase tracking-widest">
+                Boxes to Grade
+              </p>
+              <h2 className="text-foreground text-lg font-black leading-none">
+                {ungradedBoxes}{" "}
+                <span className="text-xs font-medium text-muted-foreground">
+                  Boxes
+                </span>
               </h2>
             </div>
           </div>
-          <div className="flex flex-row md:flex-col items-center md:items-end gap-2 md:gap-0 border-t md:border-t-0 pt-2 md:pt-0 border-primary/5">
-            <p className="text-muted-foreground text-[9px] font-bold uppercase">
-              Estimated Clock In Time:
+
+          {/* Time Group - Icon moved here */}
+          <div className="flex flex-col md:items-end justify-center gap-1">
+            <p className="text-muted-foreground text-[9px] font-bold uppercase tracking-widest">
+              Estimated Clock In:
             </p>
-            <p className="text-primary text-lg md:text-xl font-black">
-              {recommendedStartTime.time}
-            </p>
+            <div className="flex items-center gap-2 text-primary">
+              <Clock className="h-5 w-5" />{" "}
+              {/* Icon is now right in front of time */}
+              <p className="text-xl md:text-2xl font-black tabular-nums">
+                {recommendedStartTime.time}
+              </p>
+            </div>
           </div>
         </div>
       </Card>
@@ -320,7 +354,7 @@ async function StockAndScheduleSection({
 // Fallbacks to keep the layout from jumping
 function WeatherFallback() {
   return (
-    <Card className="md:col-span-4 h-[300px] animate-pulse bg-muted/20 border-2 border-primary/10" />
+    <Card className="md:col-span-4 h-75 animate-pulse bg-muted/20 border-2 border-primary/10" />
   );
 }
 
@@ -344,7 +378,7 @@ export default async function Page() {
   return (
     <div className="flex flex-col gap-4 md:gap-6 p-4 md:p-0 animate-in slide-in-from-bottom-4 duration-700">
       {/* HEADER CARD - Loads Instantly */}
-      <Card className="bg-gradient-to-r from-blue-600/10 via-transparent to-transparent border-2 border-primary/10">
+      <Card className="bg-linear-to-r from-blue-600/10 via-transparent to-transparent border-2 border-primary/10">
         <CardHeader className="flex flex-row items-center gap-4 md:gap-5 py-6 md:py-8">
           <div className="h-12 w-12 md:h-16 md:w-16 flex items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-xl">
             <Sparkles className="h-6 w-6 md:h-8 md:w-8" />

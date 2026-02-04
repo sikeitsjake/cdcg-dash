@@ -104,6 +104,7 @@ export async function submitEoDBreakdownToSheets(formData: FormData) {
       data["eod-fem-jumbof"],
 
       data["eod-bushels"],
+      data["eod-ungraded-boxes"],
       data["dozens-sold"],
       data["bushels-sold"],
       data["total-sales"],
@@ -202,7 +203,7 @@ export async function getLatestStockData() {
     // Fetch the range covering Date (A) through Bushels (Q)
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId,
-      range: "EoD_Data!A:Q",
+      range: "EoD_Data!A:R",
     });
 
     const rows = response.data.values;
@@ -221,6 +222,7 @@ export async function getLatestStockData() {
       totalMales: sumRange(5, 11), // Columns F-L
       totalFemales: sumRange(12, 15), // Columns M-P
       totalBushels: latestRow[16] || "0", // Column Q
+      ungraded: latestRow[17] || "0", // Column R
       date: latestRow[0],
     };
   } catch (error) {
