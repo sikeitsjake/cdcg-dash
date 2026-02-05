@@ -378,14 +378,14 @@ export default async function Page() {
   return (
     <div className="flex flex-col gap-4 md:gap-6 p-4 md:p-0 animate-in slide-in-from-bottom-4 duration-700">
       {/* HEADER CARD - Loads Instantly */}
-      <Card className="bg-linear-to-r from-blue-600/10 via-transparent to-transparent border-2 border-primary/10">
+      <Card className="border-2 border-primary/10">
         <CardHeader className="flex flex-row items-center gap-4 md:gap-5 py-6 md:py-8">
           <div className="h-12 w-12 md:h-16 md:w-16 flex items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-xl">
             <Sparkles className="h-6 w-6 md:h-8 md:w-8" />
           </div>
           <div>
             <p className="text-[10px] md:text-sm font-semibold uppercase tracking-wider text-primary">
-              Store Dashboard
+              {`Captain Dick's Dashboard`}
             </p>
             <CardTitle className="text-xl md:text-4xl font-black">
               Ready to roll,{" "}
