@@ -20,7 +20,7 @@ export async function loginWithPin(inputPin: string) {
       (await cookies()).set("session", name, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        maxAge: 7 * 24 * 60 * 60 * 1000,
+        maxAge: 60 * 60 * 24 * 7,
         path: "/",
       });
       return { success: true };
