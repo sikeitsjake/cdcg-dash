@@ -265,6 +265,111 @@ export default function TuesdayBreakdown({
           </div>
         </div>
 
+        {/* Weights Section */}
+        <Card className="border-2 border-primary/10 bg-card/50 backdrop-blur-sm">
+          <CardContent className="pt-6">
+            <div className="mb-6">
+              <h3 className="text-lg font-bold flex items-center gap-2">
+                Average Weights (lbs)
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                Enter the recorded weights for each specific regional category.
+              </p>
+            </div>
+
+            <div className="grid gap-6 md:grid-cols-3">
+              {/* Maryland Male Weights */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 text-blue-500 font-bold uppercase tracking-wider text-[10px]">
+                  <div className="h-2 w-2 rounded-full bg-blue-500" />
+                  Maryland Males
+                </div>
+                <div className="space-y-3 p-4 bg-blue-500/5 rounded-xl border border-blue-500/10">
+                  {[
+                    "Smalls",
+                    "Mediums",
+                    "Larges",
+                    "XLs",
+                    "Jumbos",
+                    "Bushels of 1s",
+                  ].map((size) => (
+                    <div key={size} className="grid gap-1.5">
+                      <Label className="text-[10px] uppercase text-muted-foreground">
+                        MD {size}
+                      </Label>
+                      <Input
+                        name={`weight-md-${size.toLowerCase().replace(/\s/g, "-")}`}
+                        type="number"
+                        step="0.01"
+                        placeholder="0.00"
+                        className="h-9 bg-background/40"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Louisiana Male Weights */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 text-red-500 font-bold uppercase tracking-wider text-[10px]">
+                  <div className="h-2 w-2 rounded-full bg-red-500" />
+                  Louisiana Males
+                </div>
+                <div className="space-y-3 p-4 bg-red-500/5 rounded-xl border border-red-500/10">
+                  {[
+                    "Smalls",
+                    "Mediums",
+                    "Larges",
+                    "XLs",
+                    "Jumbos",
+                    "Bushels of 1s",
+                  ].map((size) => (
+                    <div key={size} className="grid gap-1.5">
+                      <Label className="text-[10px] uppercase text-muted-foreground">
+                        LA {size}
+                      </Label>
+                      <Input
+                        name={`weight-la-${size.toLowerCase().replace(/\s/g, "-")}`}
+                        type="number"
+                        step="0.01"
+                        placeholder="0.00"
+                        className="h-9 bg-background/40"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Female Weights */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 text-pink-500 font-bold uppercase tracking-wider text-[10px]">
+                  <div className="h-2 w-2 rounded-full bg-pink-500" />
+                  Female Categories
+                </div>
+                <div className="space-y-3 p-4 bg-pink-500/5 rounded-xl border border-pink-500/10">
+                  {["Regular", "Large", "XL", "Jumbo"].map((size) => (
+                    <div key={size} className="grid gap-1.5">
+                      <Label className="text-[10px] uppercase text-muted-foreground">
+                        {size} Females
+                      </Label>
+                      <Input
+                        name={`weight-fem-${size.toLowerCase().replace(/\s/g, "-")}`}
+                        type="number"
+                        step="0.01"
+                        placeholder="0.00"
+                        className="h-9 bg-background/40"
+                      />
+                    </div>
+                  ))}
+                  {/* Empty space providers to keep the columns roughly even if needed */}
+                  <div className="h-[52px] hidden md:block" />
+                  <div className="h-[52px] hidden md:block" />
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Data Confirmation */}
         {!isSuccess && (
           <Card className="bg-muted/30 border-dashed border-2 border-primary/20 animate-in fade-in">

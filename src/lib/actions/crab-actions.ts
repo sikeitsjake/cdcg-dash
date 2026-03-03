@@ -1,6 +1,6 @@
 "use server";
 
-import { getGoogleSheetClient } from "@/lib/googleSheets";
+import { getGoogleSheetClient } from "@/lib/actions/googleSheets";
 
 // This function ensures every time you call it, you get the CURRENT
 // time in Eastern, formatted for your Sheets.
@@ -154,7 +154,7 @@ export async function submitTuesdayLogToSheets(formData: FormData) {
     const row = [
       date,
       data["worker-name"],
-      // Maryland
+      // Maryland Inventory (Columns C-J)
       data["md-1s"],
       data["md-2s"],
       data["md-smalls"],
@@ -163,7 +163,7 @@ export async function submitTuesdayLogToSheets(formData: FormData) {
       data["md-xls"],
       data["md-jumbos"],
       data["md-bushels-of-1's"],
-      // Louisiana
+      // Louisiana Inventory (Columns K-R)
       data["la-1s"],
       data["la-2s"],
       data["la-smalls"],
@@ -172,17 +172,38 @@ export async function submitTuesdayLogToSheets(formData: FormData) {
       data["la-xls"],
       data["la-jumbos"],
       data["la-bushels-of-1's"],
-      // Females
+      // Females Inventory (Columns S-W)
       data["num-fems"],
       data["fem-regular-females"],
       data["fem-large-females"],
       data["fem-xl-females"],
       data["fem-jumbo-females"],
+
+      // --- NEW WEIGHT DATA (Columns X-AM) ---
+      // Maryland Weights (X-AC)
+      data["weight-md-smalls"],
+      data["weight-md-mediums"],
+      data["weight-md-larges"],
+      data["weight-md-xls"],
+      data["weight-md-jumbos"],
+      data["weight-md-bushels-of-1s"],
+      // Louisiana Weights (AD-AI)
+      data["weight-la-smalls"],
+      data["weight-la-mediums"],
+      data["weight-la-larges"],
+      data["weight-la-xls"],
+      data["weight-la-jumbos"],
+      data["weight-la-bushels-of-1s"],
+      // Female Weights (AJ-AM)
+      data["weight-fem-regular"],
+      data["weight-fem-large"],
+      data["weight-fem-xl"],
+      data["weight-fem-jumbo"],
     ];
 
     await sheets.spreadsheets.values.append({
       spreadsheetId,
-      range: "Tues_Breakdown!A1", // Ensure this tab exists
+      range: "Tues_Breakdown!A1",
       valueInputOption: "USER_ENTERED",
       requestBody: { values: [row] },
     });
