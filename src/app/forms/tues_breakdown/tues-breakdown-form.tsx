@@ -122,8 +122,8 @@ export default function TuesdayBreakdown({
           </CardContent>
         </Card>
 
-        {/* 3 Column Grid for Inventory */}
-        <div className="grid gap-6 md:grid-cols-3">
+        {/* 4 Column Grid for Inventory */}
+        <div className="grid gap-6 md:grid-cols-4">
           {/* Maryland Column */}
           <div className="space-y-4">
             <h3 className="text-lg font-bold text-blue-500 flex items-center gap-2">
@@ -224,6 +224,56 @@ export default function TuesdayBreakdown({
             </div>
           </div>
 
+          {/* Texas Column (New) */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-bold text-orange-500 flex items-center gap-2">
+              <div className="h-2 w-2 rounded-full bg-orange-500" />
+              Texas Inventory
+            </h3>
+            <div className="space-y-3 p-4 bg-orange-500/5 rounded-xl border border-orange-500/20 backdrop-blur-sm">
+              <div className="grid gap-1.5">
+                <Label>{`Texas 1's`}</Label>
+                <Input
+                  name="tx-1s"
+                  type="number"
+                  placeholder="0"
+                  className="bg-background/50"
+                />
+              </div>
+              <div className="grid gap-1.5">
+                <Label>{`Texas 2's`}</Label>
+                <Input
+                  name="tx-2s"
+                  type="number"
+                  placeholder="0"
+                  className="bg-background/50"
+                />
+              </div>
+              <Separator className="my-4 bg-orange-500/20" />
+              {[
+                "Smalls",
+                "Mediums",
+                "Larges",
+                "XLs",
+                "Jumbos",
+                "Bushels of 1's",
+              ].map((size) => (
+                <div key={size} className="grid gap-1.5">
+                  <Label className="text-xs text-muted-foreground">
+                    {size}
+                  </Label>
+                  <Input
+                    name={`tx-${size.toLowerCase().replace(/\s/g, "-")}`}
+                    type="number"
+                    step="0.5"
+                    placeholder="0.0"
+                    className="h-9 bg-background/40"
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+
           {/* Female Column */}
           <div className="space-y-4">
             <h3 className="text-lg font-bold text-pink-500 flex items-center gap-2">
@@ -277,7 +327,7 @@ export default function TuesdayBreakdown({
               </p>
             </div>
 
-            <div className="grid gap-6 md:grid-cols-3">
+            <div className="grid gap-6 md:grid-cols-4">
               {/* Maryland Male Weights */}
               <div className="space-y-4">
                 <div className="flex items-center gap-2 text-blue-500 font-bold uppercase tracking-wider text-[10px]">
@@ -340,6 +390,37 @@ export default function TuesdayBreakdown({
                 </div>
               </div>
 
+              {/* Texas Male Weights (New) */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 text-orange-500 font-bold uppercase tracking-wider text-[10px]">
+                  <div className="h-2 w-2 rounded-full bg-orange-500" />
+                  Texas Males
+                </div>
+                <div className="space-y-3 p-4 bg-orange-500/5 rounded-xl border border-orange-500/10">
+                  {[
+                    "Smalls",
+                    "Mediums",
+                    "Larges",
+                    "XLs",
+                    "Jumbos",
+                    "Bushels of 1s",
+                  ].map((size) => (
+                    <div key={size} className="grid gap-1.5">
+                      <Label className="text-[10px] uppercase text-muted-foreground">
+                        TX {size}
+                      </Label>
+                      <Input
+                        name={`weight-tx-${size.toLowerCase().replace(/\s/g, "-")}`}
+                        type="number"
+                        step="0.01"
+                        placeholder="0.00"
+                        className="h-9 bg-background/40"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+
               {/* Female Weights */}
               <div className="space-y-4">
                 <div className="flex items-center gap-2 text-pink-500 font-bold uppercase tracking-wider text-[10px]">
@@ -361,7 +442,8 @@ export default function TuesdayBreakdown({
                       />
                     </div>
                   ))}
-                  {/* Empty space providers to keep the columns roughly even if needed */}
+                  {/* Spacer divs to help alignment */}
+                  <div className="h-[52px] hidden md:block" />
                   <div className="h-[52px] hidden md:block" />
                   <div className="h-[52px] hidden md:block" />
                 </div>

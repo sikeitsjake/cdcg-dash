@@ -148,57 +148,80 @@ export async function submitTuesdayLogToSheets(formData: FormData) {
     const data: Record<string, any> = {};
     for (const key in rawData) {
       const val = rawData[key];
+      // Note: key.toLowerCase() handles case-sensitivity from FormData
       data[key.toLowerCase()] = val === "" && key !== "worker-name" ? "0" : val;
     }
 
     const row = [
-      date,
-      data["worker-name"],
-      // Maryland Inventory (Columns C-J)
-      data["md-1s"],
-      data["md-2s"],
-      data["md-smalls"],
-      data["md-mediums"],
-      data["md-larges"],
-      data["md-xls"],
-      data["md-jumbos"],
-      data["md-bushels-of-1's"],
-      // Louisiana Inventory (Columns K-R)
-      data["la-1s"],
-      data["la-2s"],
-      data["la-smalls"],
-      data["la-mediums"],
-      data["la-larges"],
-      data["la-xls"],
-      data["la-jumbos"],
-      data["la-bushels-of-1's"],
-      // Females Inventory (Columns S-W)
-      data["num-fems"],
-      data["fem-regular-females"],
-      data["fem-large-females"],
-      data["fem-xl-females"],
-      data["fem-jumbo-females"],
+      date, // DATE
+      data["worker-name"], // EMPLOYEE
 
-      // --- NEW WEIGHT DATA (Columns X-AM) ---
-      // Maryland Weights (X-AC)
-      data["weight-md-smalls"],
-      data["weight-md-mediums"],
-      data["weight-md-larges"],
-      data["weight-md-xls"],
-      data["weight-md-jumbos"],
-      data["weight-md-bushels-of-1s"],
-      // Louisiana Weights (AD-AI)
-      data["weight-la-smalls"],
-      data["weight-la-mediums"],
-      data["weight-la-larges"],
-      data["weight-la-xls"],
-      data["weight-la-jumbos"],
-      data["weight-la-bushels-of-1s"],
-      // Female Weights (AJ-AM)
-      data["weight-fem-regular"],
-      data["weight-fem-large"],
-      data["weight-fem-xl"],
-      data["weight-fem-jumbo"],
+      // --- MARYLAND INVENTORY ---
+      data["md-1s"], // # MD 1'S
+      data["md-2s"], // # MD 2'S
+      data["md-smalls"], // DOZ MD SM
+      data["md-mediums"], // DOZ MD MED
+      data["md-larges"], // DOZ MD LG
+      data["md-xls"], // DOZ MD XL
+      data["md-jumbos"], // DOZ MD JUM
+      data["md-bushels-of-1's"], // BUSH MD 1'S
+
+      // --- LOUISIANA INVENTORY ---
+      data["la-1s"], // # LA 1'S
+      data["la-2s"], // # LA 2'S
+      data["la-smalls"], // DOZ LA SM
+      data["la-mediums"], // DOZ LA MED
+      data["la-larges"], // DOZ LA LG
+      data["la-xls"], // DOZ LA XL
+      data["la-jumbos"], // DOZ LA JUM
+      data["la-bushels-of-1's"], // BUSH LA 1'S
+
+      // --- TEXAS INVENTORY (NEW) ---
+      data["tx-1s"], // # TX 1'S
+      data["tx-2s"], // # TX 2'S
+      data["tx-smalls"], // DOZ TX SM
+      data["tx-mediums"], // DOZ TX MED
+      data["tx-larges"], // DOZ TX LG
+      data["tx-xls"], // DOZ TX XL
+      data["tx-jumbos"], // DOZ TX JUM
+      data["tx-bushels-of-1's"], // BUSH TX 1'S
+
+      // --- FEMALE INVENTORY ---
+      data["num-fems"], // # FEMALES
+      data["fem-regular-females"], // DOZ REGF
+      data["fem-large-females"], // DOZ LGF
+      data["fem-xl-females"], // DOZ XLF
+      data["fem-jumbo-females"], // DOZ JUMF
+
+      // --- MARYLAND WEIGHTS ---
+      data["weight-md-smalls"], // LB MD SM
+      data["weight-md-mediums"], // LB MD MD
+      data["weight-md-larges"], // LB MD ML
+      data["weight-md-xls"], // LB MD LG
+      data["weight-md-jumbos"], // LB MD XL
+      data["weight-md-bushels-of-1s"], // LB MD JUM
+
+      // --- LOUISIANA WEIGHTS ---
+      data["weight-la-smalls"], // LB LA SM
+      data["weight-la-mediums"], // LB LA MD
+      data["weight-la-larges"], // LB LA ML
+      data["weight-la-xls"], // LB LA LG
+      data["weight-la-jumbos"], // LB LA XL
+      data["weight-la-bushels-of-1s"], // LB LA JUM
+
+      // --- TEXAS WEIGHTS (NEW) ---
+      data["weight-tx-smalls"], // LB TX SM
+      data["weight-tx-mediums"], // LB TX MD
+      data["weight-tx-larges"], // LB TX ML
+      data["weight-tx-xls"], // LB TX LG
+      data["weight-tx-jumbos"], // LB TX XL
+      data["weight-tx-bushels-of-1s"], // LB TX JUM
+
+      // --- FEMALE WEIGHTS ---
+      data["weight-fem-regular"], // REGFLB
+      data["weight-fem-large"], // LGFLB
+      data["weight-fem-xl"], // XLFLB
+      data["weight-fem-jumbo"], // JUMF
     ];
 
     await sheets.spreadsheets.values.append({
