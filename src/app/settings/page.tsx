@@ -7,10 +7,24 @@ import { Switch } from "@/components/ui/switch";
 import { useTheme } from "next-themes";
 import { Monitor, User, Type, Moon, Sun } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { LogOut } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { logout } from "@/lib/actions/auth-actions"; // Import the new action
+import { useRouter } from "next/navigation";
 
 export default function SettingsPage() {
-  const [activeTab, setActiveTab] = useState("display");
+  const [activeTab, setActiveTab] = useState("account");
   const { theme, setTheme } = useTheme();
+
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    await logout();
+    // Refresh forces the server-side middleware (proxy.ts) to check the cookie
+    router.refresh();
+    router.push("/login");
+  };
 
   const categories = [
     { id: "account", label: "Account", icon: User },
@@ -106,18 +120,46 @@ export default function SettingsPage() {
               </div>
             </div>
           )}
-
-          {activeTab === "account" || activeTab === "text-size" ? (
-            <div className="flex flex-col items-center justify-center py-20 rounded-2xl border border-dashed bg-muted/30 text-center animate-in fade-in duration-700">
-              <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center mb-4">
-                <div className="h-2 w-2 rounded-full bg-muted-foreground animate-pulse" />
+          {activeTab === "account" && (
+            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
+              <div className="space-y-1">
+                <h3 className="text-xl font-semibold">Account</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  Manage your active session and security preferences.
+                </p>
               </div>
-              <p className="text-sm font-medium text-muted-foreground italic">
-                Coming soon: {categories.find((c) => c.id === activeTab)?.label}{" "}
-                Settings
-              </p>
+
+              <div className="grid gap-4">
+                {/* Logout Card */}
+                <div className="group relative flex items-center justify-between rounded-xl border bg-card p-5 shadow-sm transition-all hover:shadow-md dark:bg-zinc-900/50 dark:hover:bg-zinc-900">
+                  <div className="flex items-center gap-4">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted transition-colors group-hover:bg-background">
+                      <LogOut className="h-5 w-5 text-muted-foreground transition-colors group-hover:text-primary" />
+                    </div>
+                    <div className="space-y-0.5">
+                      <Label className="text-base font-semibold">
+                        Session Management
+                      </Label>
+                      <p className="text-xs text-muted-foreground">
+                        Current status:{" "}
+                        <span className="capitalize text-primary font-medium">
+                          Logged In
+                        </span>
+                      </p>
+                    </div>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleLogout}
+                    className="h-9 px-4 font-bold text-xs tracking-wide transition-all border-primary/20 hover:bg-destructive hover:text-destructive-foreground hover:border-destructive"
+                  >
+                    SIGN OUT
+                  </Button>
+                </div>
+              </div>
             </div>
-          ) : null}
+          )}{" "}
         </div>
       </div>
     </div>

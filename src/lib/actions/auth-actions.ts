@@ -29,3 +29,16 @@ export async function loginWithPin(inputPin: string) {
 
   return { success: false };
 }
+
+export async function logout() {
+  (await cookies()).set("session", "", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    expires: new Date(0), // Sets expiration to 1970 (immediate deletion)
+    path: "/",
+  });
+
+  // No need to manually refresh; the redirect forces the middleware
+  // (proxy.ts) to re-evaluate the now-missing session.
+  return { success: true };
+}
