@@ -122,198 +122,231 @@ export default function TuesdayBreakdown({
           </CardContent>
         </Card>
 
-        {/* 4 Column Grid for Inventory */}
-        <div className="grid gap-6 md:grid-cols-4">
-          {/* Maryland Column */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-bold text-blue-500 flex items-center gap-2">
-              <div className="h-2 w-2 rounded-full bg-blue-500" />
-              Maryland Inventory
-            </h3>
-            <div className="space-y-3 p-4 bg-blue-500/5 rounded-xl border border-blue-500/20 backdrop-blur-sm">
-              <div className="grid gap-1.5">
-                <Label>{`Maryland 1's`}</Label>
-                <Input
-                  name="md-1s"
-                  type="number"
-                  placeholder="0"
-                  className="bg-background/50"
-                />
-              </div>
-              <div className="grid gap-1.5">
-                <Label>{`Maryland 2's`}</Label>
-                <Input
-                  name="md-2s"
-                  type="number"
-                  placeholder="0"
-                  className="bg-background/50"
-                />
-              </div>
-              <Separator className="my-4 bg-blue-500/20" />
-              {[
-                "Smalls",
-                "Mediums",
-                "Larges",
-                "XLs",
-                "Jumbos",
-                "Bushels of 1's",
-              ].map((size) => (
-                <div key={size} className="grid gap-1.5">
-                  <Label className="text-xs text-muted-foreground">
-                    {size}
-                  </Label>
-                  <Input
-                    name={`md-${size.toLowerCase().replace(/\s/g, "-")}`}
-                    type="number"
-                    step="0.5"
-                    placeholder="0.0"
-                    className="h-9 bg-background/40"
-                  />
-                </div>
-              ))}
+        {/* Inventory Section */}
+        <Card className="border-2 border-primary/10 bg-card/50 backdrop-blur-sm">
+          <CardContent className="pt-6">
+            <div className="mb-6">
+              <h3 className="text-lg font-bold flex items-center gap-2">
+                Inventory Counts
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                Enter the current stock levels for each regional category and
+                size.
+              </p>
             </div>
-          </div>
 
-          {/* Louisiana Column */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-bold text-red-500 flex items-center gap-2">
-              <div className="h-2 w-2 rounded-full bg-red-500" />
-              Louisiana Inventory
-            </h3>
-            <div className="space-y-3 p-4 bg-red-500/5 rounded-xl border border-red-500/20 backdrop-blur-sm">
-              <div className="grid gap-1.5">
-                <Label>{`Louisiana 1's`}</Label>
-                <Input
-                  name="la-1s"
-                  type="number"
-                  placeholder="0"
-                  className="bg-background/50"
-                />
-              </div>
-              <div className="grid gap-1.5">
-                <Label>{`Louisiana 2's`}</Label>
-                <Input
-                  name="la-2s"
-                  type="number"
-                  placeholder="0"
-                  className="bg-background/50"
-                />
-              </div>
-              <Separator className="my-4 bg-red-500/20" />
-              {[
-                "Smalls",
-                "Mediums",
-                "Larges",
-                "XLs",
-                "Jumbos",
-                "Bushels of 1's",
-              ].map((size) => (
-                <div key={size} className="grid gap-1.5">
-                  <Label className="text-xs text-muted-foreground">
-                    {size}
-                  </Label>
-                  <Input
-                    name={`la-${size.toLowerCase().replace(/\s/g, "-")}`}
-                    type="number"
-                    step="0.5"
-                    placeholder="0.0"
-                    className="h-9 bg-background/40"
-                  />
+            <div className="grid gap-6 md:grid-cols-4">
+              {/* Maryland Column */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 text-blue-500 font-bold uppercase tracking-wider text-[10px]">
+                  <div className="h-2 w-2 rounded-full bg-blue-500" />
+                  Maryland Inventory
                 </div>
-              ))}
-            </div>
-          </div>
+                <div className="space-y-3 p-4 bg-blue-500/5 rounded-xl border border-blue-500/10">
+                  <div className="grid gap-1.5">
+                    <Label className="text-[10px] uppercase text-muted-foreground">
+                      Maryland 1's
+                    </Label>
+                    <Input
+                      name="md-1s"
+                      type="number"
+                      placeholder="0"
+                      className="h-9 bg-background/50"
+                    />
+                  </div>
+                  <div className="grid gap-1.5">
+                    <Label className="text-[10px] uppercase text-muted-foreground">
+                      Maryland 2's
+                    </Label>
+                    <Input
+                      name="md-2s"
+                      type="number"
+                      placeholder="0"
+                      className="h-9 bg-background/50"
+                    />
+                  </div>
+                  <Separator className="my-2 bg-blue-500/20" />
+                  {[
+                    "Smalls",
+                    "Mediums",
+                    "Larges",
+                    "XLs",
+                    "Jumbos",
+                    "Medium Larges",
+                  ].map((size) => (
+                    <div key={size} className="grid gap-1.5">
+                      <Label className="text-[10px] uppercase text-muted-foreground">
+                        MD {size}
+                      </Label>
+                      <Input
+                        name={`md-${size.toLowerCase().replace(/\s/g, "-")}`}
+                        type="number"
+                        step="0.01"
+                        placeholder="0.0"
+                        className="h-9 bg-background/40"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
 
-          {/* Texas Column (New) */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-bold text-orange-500 flex items-center gap-2">
-              <div className="h-2 w-2 rounded-full bg-orange-500" />
-              Texas Inventory
-            </h3>
-            <div className="space-y-3 p-4 bg-orange-500/5 rounded-xl border border-orange-500/20 backdrop-blur-sm">
-              <div className="grid gap-1.5">
-                <Label>{`Texas 1's`}</Label>
-                <Input
-                  name="tx-1s"
-                  type="number"
-                  placeholder="0"
-                  className="bg-background/50"
-                />
-              </div>
-              <div className="grid gap-1.5">
-                <Label>{`Texas 2's`}</Label>
-                <Input
-                  name="tx-2s"
-                  type="number"
-                  placeholder="0"
-                  className="bg-background/50"
-                />
-              </div>
-              <Separator className="my-4 bg-orange-500/20" />
-              {[
-                "Smalls",
-                "Mediums",
-                "Larges",
-                "XLs",
-                "Jumbos",
-                "Bushels of 1's",
-              ].map((size) => (
-                <div key={size} className="grid gap-1.5">
-                  <Label className="text-xs text-muted-foreground">
-                    {size}
-                  </Label>
-                  <Input
-                    name={`tx-${size.toLowerCase().replace(/\s/g, "-")}`}
-                    type="number"
-                    step="0.5"
-                    placeholder="0.0"
-                    className="h-9 bg-background/40"
-                  />
+              {/* Louisiana Column */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 text-red-500 font-bold uppercase tracking-wider text-[10px]">
+                  <div className="h-2 w-2 rounded-full bg-red-500" />
+                  Louisiana Inventory
                 </div>
-              ))}
-            </div>
-          </div>
+                <div className="space-y-3 p-4 bg-red-500/5 rounded-xl border border-red-500/10">
+                  <div className="grid gap-1.5">
+                    <Label className="text-[10px] uppercase text-muted-foreground">
+                      Louisiana 1's
+                    </Label>
+                    <Input
+                      name="la-1s"
+                      type="number"
+                      placeholder="0"
+                      className="h-9 bg-background/50"
+                    />
+                  </div>
+                  <div className="grid gap-1.5">
+                    <Label className="text-[10px] uppercase text-muted-foreground">
+                      Louisiana 2's
+                    </Label>
+                    <Input
+                      name="la-2s"
+                      type="number"
+                      placeholder="0"
+                      className="h-9 bg-background/50"
+                    />
+                  </div>
+                  <Separator className="my-2 bg-red-500/20" />
+                  {[
+                    "Smalls",
+                    "Mediums",
+                    "Larges",
+                    "XLs",
+                    "Jumbos",
+                    "Medium Larges",
+                  ].map((size) => (
+                    <div key={size} className="grid gap-1.5">
+                      <Label className="text-[10px] uppercase text-muted-foreground">
+                        LA {size}
+                      </Label>
+                      <Input
+                        name={`la-${size.toLowerCase().replace(/\s/g, "-")}`}
+                        type="number"
+                        step="0.01"
+                        placeholder="0.0"
+                        className="h-9 bg-background/40"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
 
-          {/* Female Column */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-bold text-pink-500 flex items-center gap-2">
-              <div className="h-2 w-2 rounded-full bg-pink-500" />
-              Female Inventory
-            </h3>
-            <div className="space-y-3 p-4 bg-pink-500/5 rounded-xl border border-pink-500/20 backdrop-blur-sm">
-              <div className="grid gap-1.5">
-                <Label>Boxes of Females</Label>
-                <Input
-                  name="num-fems"
-                  type="number"
-                  placeholder="0"
-                  className="bg-background/50"
-                />
-              </div>
-              <div className="h-[56px] hidden md:block" />
-              <Separator className="my-4 bg-pink-500/20" />
-              {[
-                "Regular Females",
-                "Large Females",
-                "XL Females",
-                "Jumbo Females",
-              ].map((size) => (
-                <div key={size} className="grid gap-1.5">
-                  <Label className="text-xs text-muted-foreground">
-                    {size}
-                  </Label>
-                  <Input
-                    name={`fem-${size.toLowerCase().replace(/\s/g, "-")}`}
-                    type="number"
-                    step="0.5"
-                    placeholder="0.0"
-                    className="h-9 bg-background/40"
-                  />
+              {/* Texas Column */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 text-orange-500 font-bold uppercase tracking-wider text-[10px]">
+                  <div className="h-2 w-2 rounded-full bg-orange-500" />
+                  Texas Inventory
                 </div>
-              ))}
+                <div className="space-y-3 p-4 bg-orange-500/5 rounded-xl border border-orange-500/10">
+                  <div className="grid gap-1.5">
+                    <Label className="text-[10px] uppercase text-muted-foreground">
+                      Texas 1's
+                    </Label>
+                    <Input
+                      name="tx-1s"
+                      type="number"
+                      placeholder="0"
+                      className="h-9 bg-background/50"
+                    />
+                  </div>
+                  <div className="grid gap-1.5">
+                    <Label className="text-[10px] uppercase text-muted-foreground">
+                      Texas 2's
+                    </Label>
+                    <Input
+                      name="tx-2s"
+                      type="number"
+                      placeholder="0"
+                      className="h-9 bg-background/50"
+                    />
+                  </div>
+                  <Separator className="my-2 bg-orange-500/20" />
+                  {[
+                    "Smalls",
+                    "Mediums",
+                    "Larges",
+                    "XLs",
+                    "Jumbos",
+                    "Medium Larges",
+                  ].map((size) => (
+                    <div key={size} className="grid gap-1.5">
+                      <Label className="text-[10px] uppercase text-muted-foreground">
+                        TX {size}
+                      </Label>
+                      <Input
+                        name={`tx-${size.toLowerCase().replace(/\s/g, "-")}`}
+                        type="number"
+                        step="0.01"
+                        placeholder="0.0"
+                        className="h-9 bg-background/40"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Female Column */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 text-pink-500 font-bold uppercase tracking-wider text-[10px]">
+                  <div className="h-2 w-2 rounded-full bg-pink-500" />
+                  Female Inventory
+                </div>
+                <div className="space-y-3 p-4 bg-pink-500/5 rounded-xl border border-pink-500/10">
+                  <div className="grid gap-1.5">
+                    <Label className="text-[10px] uppercase text-muted-foreground">
+                      Boxes of Females
+                    </Label>
+                    <Input
+                      name="num-fems"
+                      type="number"
+                      placeholder="0"
+                      className="h-9 bg-background/50"
+                    />
+                  </div>
+                  {/* Alignment spacer to match the two-row input height of the other columns */}
+                  <div className="h-[52px] hidden md:block" />
+
+                  <Separator className="my-2 bg-pink-500/20" />
+                  {[
+                    "Regular Females",
+                    "Large Females",
+                    "XL Females",
+                    "Jumbo Females",
+                  ].map((size) => (
+                    <div key={size} className="grid gap-1.5">
+                      <Label className="text-[10px] uppercase text-muted-foreground">
+                        {size}
+                      </Label>
+                      <Input
+                        name={`fem-${size.toLowerCase().replace(/\s/g, "-")}`}
+                        type="number"
+                        step="0.01"
+                        placeholder="0.0"
+                        className="h-9 bg-background/40"
+                      />
+                    </div>
+                  ))}
+                  {/* Visual spacers to keep columns level */}
+                  <div className="h-[52px] hidden md:block" />
+                  <div className="h-[52px] hidden md:block" />
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
 
         {/* Weights Section */}
         <Card className="border-2 border-primary/10 bg-card/50 backdrop-blur-sm">
@@ -341,7 +374,7 @@ export default function TuesdayBreakdown({
                     "Larges",
                     "XLs",
                     "Jumbos",
-                    "Bushels of 1s",
+                    "Medium Larges",
                   ].map((size) => (
                     <div key={size} className="grid gap-1.5">
                       <Label className="text-[10px] uppercase text-muted-foreground">
@@ -372,7 +405,7 @@ export default function TuesdayBreakdown({
                     "Larges",
                     "XLs",
                     "Jumbos",
-                    "Bushels of 1s",
+                    "Medium Larges",
                   ].map((size) => (
                     <div key={size} className="grid gap-1.5">
                       <Label className="text-[10px] uppercase text-muted-foreground">
@@ -403,7 +436,7 @@ export default function TuesdayBreakdown({
                     "Larges",
                     "XLs",
                     "Jumbos",
-                    "Bushels of 1s",
+                    "Medium Larges",
                   ].map((size) => (
                     <div key={size} className="grid gap-1.5">
                       <Label className="text-[10px] uppercase text-muted-foreground">
