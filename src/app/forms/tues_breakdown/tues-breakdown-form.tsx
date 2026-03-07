@@ -299,12 +299,14 @@ export default function TuesdayBreakdown({
               </div>
 
               {/* Female Column */}
-              <div className="space-y-4">
+              <div className="space-y-4 flex flex-col h-full">
                 <div className="flex items-center gap-2 text-pink-500 font-bold uppercase tracking-wider text-[10px]">
                   <div className="h-2 w-2 rounded-full bg-pink-500" />
                   Female Inventory
                 </div>
-                <div className="space-y-3 p-4 bg-pink-500/5 rounded-xl border border-pink-500/10">
+
+                <div className="flex-1 space-y-3 p-4 bg-pink-500/5 rounded-xl border border-pink-500/10">
+                  {/* Row 1: Aligns with MD/LA/TX 1's */}
                   <div className="grid gap-1.5">
                     <Label className="text-[10px] uppercase text-muted-foreground">
                       Boxes of Females
@@ -316,10 +318,21 @@ export default function TuesdayBreakdown({
                       className="h-9 bg-background/50"
                     />
                   </div>
-                  {/* Alignment spacer to match the two-row input height of the other columns */}
-                  <div className="h-[52px] hidden md:block" />
 
+                  {/* Row 2: HIDDEN SPACER - Aligns with MD/LA/TX 2's */}
+                  {/* This ensures the Separator below it is perfectly level across the grid */}
+                  <div
+                    className="grid gap-1.5 invisible select-none"
+                    aria-hidden="true"
+                  >
+                    <Label className="text-[10px] uppercase">Spacer</Label>
+                    <div className="h-9" />
+                  </div>
+
+                  {/* Separator - Now perfectly aligned with MD, LA, and TX separators */}
                   <Separator className="my-2 bg-pink-500/20" />
+
+                  {/* Row 3+: Aligns with Regular, Smalls, etc. */}
                   {[
                     "Regular Females",
                     "Large Females",
@@ -339,9 +352,6 @@ export default function TuesdayBreakdown({
                       />
                     </div>
                   ))}
-                  {/* Visual spacers to keep columns level */}
-                  <div className="h-[52px] hidden md:block" />
-                  <div className="h-[52px] hidden md:block" />
                 </div>
               </div>
             </div>
@@ -455,12 +465,13 @@ export default function TuesdayBreakdown({
               </div>
 
               {/* Female Weights */}
-              <div className="space-y-4">
+              <div className="space-y-4 flex flex-col h-full">
                 <div className="flex items-center gap-2 text-pink-500 font-bold uppercase tracking-wider text-[10px]">
                   <div className="h-2 w-2 rounded-full bg-pink-500" />
                   Female Categories
                 </div>
-                <div className="space-y-3 p-4 bg-pink-500/5 rounded-xl border border-pink-500/10">
+                {/* h-full ensures this box stretches to match the tallest sibling in the grid */}
+                <div className="h-full space-y-3 p-4 bg-pink-500/5 rounded-xl border border-pink-500/10">
                   {["Regular", "Large", "XL", "Jumbo"].map((size) => (
                     <div key={size} className="grid gap-1.5">
                       <Label className="text-[10px] uppercase text-muted-foreground">
@@ -475,10 +486,96 @@ export default function TuesdayBreakdown({
                       />
                     </div>
                   ))}
-                  {/* Spacer divs to help alignment */}
-                  <div className="h-[52px] hidden md:block" />
-                  <div className="h-[52px] hidden md:block" />
-                  <div className="h-[52px] hidden md:block" />
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Dead Loss Section*/}
+        <Card className="border-2 border-primary/10 bg-card/50 backdrop-blur-sm">
+          <CardContent className="pt-6">
+            <div className="mb-6">
+              <h3 className="text-lg font-bold flex items-center gap-2">
+                Dead Loss (lbs)
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                Record dead loss weights categorized by size and grade.
+              </p>
+            </div>
+
+            <div className="grid gap-6 md:grid-cols-3">
+              {/* #1 Males Column */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 text-blue-500 font-bold uppercase tracking-wider text-[10px]">
+                  <div className="h-2 w-2 rounded-full bg-blue-500" />
+                  #1 Males
+                </div>
+                <div className="space-y-3 p-4 bg-blue-500/5 rounded-xl border border-blue-500/10">
+                  {[{ label: "Dead #1's", id: "dead-1s" }].map((item) => (
+                    <div key={item.id} className="grid gap-1.5">
+                      <Label className="text-[10px] uppercase text-muted-foreground">
+                        {item.label}
+                      </Label>
+                      <Input
+                        name={`deadloss-${item.id}`}
+                        type="number"
+                        step="0.01"
+                        placeholder="0.00"
+                        className="h-9 bg-background/40"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* #2 Males Column */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 text-orange-500 font-bold uppercase tracking-wider text-[10px]">
+                  <div className="h-2 w-2 rounded-full bg-orange-500" />
+                  #2 Males
+                </div>
+                <div className="space-y-3 p-4 bg-orange-500/5 rounded-xl border border-orange-500/10">
+                  {[{ label: "Dead #2's", id: "dead-2s" }].map((item) => (
+                    <div key={item.id} className="grid gap-1.5">
+                      <Label className="text-[10px] uppercase text-muted-foreground">
+                        {item.label}
+                      </Label>
+                      <Input
+                        name={`deadloss-${item.id}`}
+                        type="number"
+                        step="0.01"
+                        placeholder="0.00"
+                        className="h-9 bg-background/40"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Females Column */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 text-pink-500 font-bold uppercase tracking-wider text-[10px]">
+                  <div className="h-2 w-2 rounded-full bg-pink-500" />
+                  Females
+                </div>
+                <div className="space-y-3 p-4 bg-pink-500/5 rounded-xl border border-pink-500/10">
+                  {[{ label: "Dead Females", id: "dead-females" }].map(
+                    (item) => (
+                      <div key={item.id} className="grid gap-1.5">
+                        <Label className="text-[10px] uppercase text-muted-foreground">
+                          {item.label}
+                        </Label>
+                        <Input
+                          name={`deadloss-${item.id}`}
+                          type="number"
+                          step="0.01"
+                          placeholder="0.00"
+                          className="h-9 bg-background/40"
+                        />
+                      </div>
+                    ),
+                  )}
                 </div>
               </div>
             </div>

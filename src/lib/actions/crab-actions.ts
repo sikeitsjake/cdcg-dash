@@ -164,7 +164,7 @@ export async function submitTuesdayLogToSheets(formData: FormData) {
       data["md-larges"], // DOZ MD LG
       data["md-xls"], // DOZ MD XL
       data["md-jumbos"], // DOZ MD JUM
-      data["md-bushels-of-1's"], // BUSH MD 1'S
+      data["md-medium-larges"], // BUSH MD 1'S
 
       // --- LOUISIANA INVENTORY ---
       data["la-1s"], // # LA 1'S
@@ -174,7 +174,7 @@ export async function submitTuesdayLogToSheets(formData: FormData) {
       data["la-larges"], // DOZ LA LG
       data["la-xls"], // DOZ LA XL
       data["la-jumbos"], // DOZ LA JUM
-      data["la-bushels-of-1's"], // BUSH LA 1'S
+      data["la-medium-larges"], // BUSH LA 1'S
 
       // --- TEXAS INVENTORY (NEW) ---
       data["tx-1s"], // # TX 1'S
@@ -184,7 +184,7 @@ export async function submitTuesdayLogToSheets(formData: FormData) {
       data["tx-larges"], // DOZ TX LG
       data["tx-xls"], // DOZ TX XL
       data["tx-jumbos"], // DOZ TX JUM
-      data["tx-bushels-of-1's"], // BUSH TX 1'S
+      data["tx-medium-larges"], // BUSH TX 1'S
 
       // --- FEMALE INVENTORY ---
       data["num-fems"], // # FEMALES
@@ -199,7 +199,7 @@ export async function submitTuesdayLogToSheets(formData: FormData) {
       data["weight-md-larges"], // LB MD ML
       data["weight-md-xls"], // LB MD LG
       data["weight-md-jumbos"], // LB MD XL
-      data["weight-md-bushels-of-1s"], // LB MD JUM
+      data["weight-md-medium-larges"], // LB MD JUM
 
       // --- LOUISIANA WEIGHTS ---
       data["weight-la-smalls"], // LB LA SM
@@ -207,7 +207,7 @@ export async function submitTuesdayLogToSheets(formData: FormData) {
       data["weight-la-larges"], // LB LA ML
       data["weight-la-xls"], // LB LA LG
       data["weight-la-jumbos"], // LB LA XL
-      data["weight-la-bushels-of-1s"], // LB LA JUM
+      data["weight-la-medium-larges"], // LB LA JUM
 
       // --- TEXAS WEIGHTS (NEW) ---
       data["weight-tx-smalls"], // LB TX SM
@@ -215,13 +215,18 @@ export async function submitTuesdayLogToSheets(formData: FormData) {
       data["weight-tx-larges"], // LB TX ML
       data["weight-tx-xls"], // LB TX LG
       data["weight-tx-jumbos"], // LB TX XL
-      data["weight-tx-bushels-of-1s"], // LB TX JUM
+      data["weight-tx-medium-larges"], // LB TX JUM
 
       // --- FEMALE WEIGHTS ---
       data["weight-fem-regular"], // REGFLB
       data["weight-fem-large"], // LGFLB
       data["weight-fem-xl"], // XLFLB
       data["weight-fem-jumbo"], // JUMF
+
+      // --- DEADLOSS ---
+      data["deadloss-dead-1s"],
+      data["deadloss-dead-2s"],
+      data["deadloss-dead-females"],
     ];
 
     await sheets.spreadsheets.values.append({
