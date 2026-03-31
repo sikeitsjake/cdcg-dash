@@ -243,6 +243,49 @@ export async function submitTuesdayLogToSheets(formData: FormData) {
   }
 }
 
+export async function submitDeadLoss(formData: FormData) {
+  try {
+    const sheets = await getGoogleSheetClient();
+    const spreadsheetId = process.env.GOOGLE_SHEET_ID;
+    const date = getGlobalDate();
+
+    // 1. Convert FormData to a usable object
+    const rawData = Object.fromEntries(formData.entries());
+
+    // 2. Normalize inputs: Default empty strings to "0"
+    const data: Record<string, string> = {};
+    for (const key in rawData) {
+      const val = rawData[key] as string;
+      data[key.toLowerCase()] = val === "" ? "0" : val;
+    }
+
+    // 3. Extract specific values (matching the 'name' attributes in your JSX)
+    const mornLoss = parseFloat(data["morn_loss"] || "0");
+    const gradeLoss = parseFloat(data["grade_loss"] || "0");
+    const totalLoss = mornLoss + gradeLoss;
+
+    // 4. Map to Google Sheet Row Structure
+    // Order: Date, Morning Loss, Grading Loss, Total Loss
+    const row = [date, mornLoss, gradeLoss, totalLoss];
+
+    // 5. Append to the specific sheet tab
+    await sheets.spreadsheets.values.append({
+      spreadsheetId,
+      range: "Daily_Dead_Loss!A1", // Ensure this tab exists in your Google Sheet
+      valueInputOption: "USER_ENTERED",
+      requestBody: { values: [row] },
+    });
+
+    return { success: true };
+  } catch (error) {
+    console.error("Dead Loss Submission Error:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Submission failed",
+    };
+  }
+}
+
 // FUNCTION CALLED BY HOME.TSX
 export async function getLatestStockData() {
   try {

@@ -34,6 +34,12 @@ const ALL_FORMS = [
     desc: "Log which docks are sending what.",
     category: "Internal",
   },
+  {
+    id: "daily_dead_loss",
+    title: "Daily Dead Loss",
+    desc: "Log the daily dead loss (lbs) from different parts of the day.",
+    category: "Internal",
+  },
 ];
 
 export default function FormsPage({ userName }: FormsPageProps) {
