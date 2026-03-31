@@ -2,7 +2,7 @@
 
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -30,6 +30,12 @@ import { submitEoDBreakdownToSheets } from "@/lib/actions/crab-actions";
 export default function EoDSalesBreakdown() {
   const [isPending, setIsPending] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [weatherVal, setWeatherVal] = useState("");
+  const [sales, setSales] = useState({
+    total: "",
+    card: "",
+    cash: "",
+  });
 
   const WEATHER_CONDITIONS = [
     "Sunny",
@@ -42,6 +48,72 @@ export default function EoDSalesBreakdown() {
 
   const MALE_SIZES = ["SM", "MD", "ML", "LG", "XL", "JUMBO", "SUPER"];
   const FEMALE_SIZES = ["REGF", "LGF", "XLF", "JUMBOF"];
+
+  // Update the values and calculate the missing one
+  const updateSales = (field: string, value: string) => {
+    const numVal = parseFloat(value) || 0;
+
+    setSales((prev) => {
+      const newState = { ...prev, [field]: value };
+
+      // Logic: If user edits Total & Card -> Update Cash
+      if (field === "total" || field === "card") {
+        const total = field === "total" ? numVal : parseFloat(prev.total) || 0;
+        const card = field === "card" ? numVal : parseFloat(prev.card) || 0;
+        if (field === "total" || prev.total !== "") {
+          newState.cash = (total - card).toFixed(2);
+        }
+      }
+      // Logic: If user edits Cash -> Update Total (assuming Card stays same)
+      else if (field === "cash") {
+        const card = parseFloat(prev.card) || 0;
+        newState.total = (card + numVal).toFixed(2);
+      }
+
+      return newState;
+    });
+  };
+
+  useEffect(() => {
+    // Use a variable to track if the component is still "alive"
+    let isMounted = true;
+
+    const fetchWeather = async (lat: number, lon: number) => {
+      try {
+        const response = await fetch(
+          `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&temperature_unit=fahrenheit`,
+        );
+        const data = await response.json();
+
+        // Only update state if the user is still on this page
+        if (isMounted && data.current_weather) {
+          setWeatherVal(
+            Math.round(data.current_weather.temperature).toString(),
+          );
+        }
+      } catch (error) {
+        console.error("Failed to fetch weather:", error);
+      }
+    };
+
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          fetchWeather(position.coords.latitude, position.coords.longitude);
+        },
+        (error) => {
+          // Quietly fail in production so the user isn't annoyed
+          console.log("Weather auto-populate skipped: Location disabled.");
+        },
+        { timeout: 10000 }, // Safety: don't let the geo-request hang forever
+      );
+    }
+
+    // Cleanup function: runs when the user leaves the page
+    return () => {
+      isMounted = false;
+    };
+  }, []); // setWeatherVal is stable, so empty array is fine here
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && (e.target as HTMLElement).tagName !== "TEXTAREA") {
@@ -116,6 +188,8 @@ export default function EoDSalesBreakdown() {
                     name="weather-val"
                     type="number"
                     placeholder="72"
+                    value={weatherVal} // Bind to state
+                    onChange={(e) => setWeatherVal(e.target.value)} // Allow manual override
                     className="bg-background/50"
                   />
                 </div>
@@ -296,6 +370,8 @@ export default function EoDSalesBreakdown() {
                     name="total-sales"
                     type="number"
                     step="0.01"
+                    value={sales.total}
+                    onChange={(e) => updateSales("total", e.target.value)}
                     className="pl-9 bg-background/50 font-mono text-lg"
                     placeholder="0.00"
                   />
@@ -304,24 +380,30 @@ export default function EoDSalesBreakdown() {
               <div className="grid grid-cols-2 gap-4">
                 <div className="grid gap-2">
                   <Label className="text-xs text-muted-foreground">
-                    Card Sales
+                    {" "}
+                    Card Sales{" "}
                   </Label>
                   <Input
                     name="card-sales"
                     type="number"
                     step="0.01"
+                    value={sales.card}
+                    onChange={(e) => updateSales("card", e.target.value)}
                     className="bg-background/50"
                     placeholder="0.00"
                   />
                 </div>
                 <div className="grid gap-2">
                   <Label className="text-xs text-muted-foreground">
-                    Cash Sales
+                    {" "}
+                    Cash Sales{" "}
                   </Label>
                   <Input
                     name="cash-sales"
                     type="number"
                     step="0.01"
+                    value={sales.cash}
+                    onChange={(e) => updateSales("cash", e.target.value)}
                     className="bg-background/50"
                     placeholder="0.00"
                   />
