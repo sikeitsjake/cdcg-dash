@@ -63,16 +63,14 @@ export async function submitEoDBreakdownToSheets(formData: FormData) {
       const lowerKey = key.toLowerCase();
       const value = rawData[key];
 
-      // Check if it's an inventory, sales, or count field
-      // These usually start with 'eod', 'num', or end in 'sales'/'sold'
+      // Mark numeric fields to default to 0 if empty
       const isNumericField =
         lowerKey.startsWith("eod") ||
         lowerKey.startsWith("num") ||
+        lowerKey.startsWith("sold") ||
         lowerKey.includes("sales") ||
-        lowerKey.includes("sold") ||
         lowerKey.includes("val");
 
-      // If it's a numeric field and the value is empty/null, set it to 0
       if (isNumericField && (value === "" || value === null)) {
         data[lowerKey] = 0;
       } else {
@@ -80,15 +78,15 @@ export async function submitEoDBreakdownToSheets(formData: FormData) {
       }
     }
 
-    // 2. Map data (using lowercase keys)
+    // 2. Map data exactly to the Sheet's column order
     const row = [
-      date,
-      data["time-closed"] || "N/A",
-      data["weather-val"], // Now defaults to 0
-      data["weather-condition"] || "N/A",
-      data["specials"] || "None",
+      date, // Date
+      data["time-closed"] || "N/A", // closing time
+      data["weather-val"], // temp
+      data["weather-condition"] || "N/A", // condition
+      data["specials"] || "None", // specials
 
-      // Male Counts
+      // Male Counts (Remaining)
       data["eod-sm"],
       data["eod-md"],
       data["eod-ml"],
@@ -97,26 +95,41 @@ export async function submitEoDBreakdownToSheets(formData: FormData) {
       data["eod-jumbo"],
       data["eod-super"],
 
-      // Female Counts
+      // Female Counts (Remaining)
       data["eod-fem-regf"],
       data["eod-fem-lgf"],
       data["eod-fem-xlf"],
       data["eod-fem-jumbof"],
 
-      data["eod-bushels"],
-      data["eod-ungraded-boxes"],
-      data["dozens-sold"],
-      data["bushels-sold"],
-      data["total-sales"],
-      data["card-sales"],
-      data["cash-sales"],
+      data["eod-bushels"], // eod bush
+      data["eod-ungraded-boxes"], // ungraded boxes
+      data["total-dozens-sold"], // total doz sold
+      data["total-bushels-sold"], // total bush sold
+      data["total-sales"], // total sale
+      data["card-sales"], // card sales
+      data["cash-sales"], // cash sales
 
       // Labor
-      data["num-employees"],
-      data["num-late-employees"],
-      data["late-reason"] || "N/A",
-      data["num-cut"],
-      data["cut-reason"] || "N/A",
+      data["num-employees"], // num workers
+      data["num-late-employees"], // num late workers
+      data["late-reason"] || "N/A", // late reason
+      data["num-cut"], // num cut workers
+      data["cut-reason"] || "N/A", // cut reason
+
+      // Volume Sold (Specific Sizes)
+      data["sold-male-sm"],
+      data["sold-male-md"],
+      data["sold-male-ml"],
+      data["sold-male-lg"],
+      data["sold-male-xl"],
+      data["sold-male-jumbo"],
+      data["sold-male-super"],
+      data["sold-bushel-1's"],
+      data["sold-bushel-2's"],
+      data["sold-female-regf"],
+      data["sold-female-lgf"],
+      data["sold-female-xlf"],
+      data["sold-female-jumbof"],
     ];
 
     await sheets.spreadsheets.values.append({
