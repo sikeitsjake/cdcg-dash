@@ -91,15 +91,13 @@ export async function submitEoDBreakdownToSheets(formData: FormData) {
       data["eod-md"],
       data["eod-ml"],
       data["eod-lg"],
-      data["eod-xl"],
-      data["eod-jumbo"],
+      data["eod-xlj"],
       data["eod-super"],
 
       // Female Counts (Remaining)
       data["eod-fem-regf"],
       data["eod-fem-lgf"],
-      data["eod-fem-xlf"],
-      data["eod-fem-jumbof"],
+      data["eod-fem-xljf"],
 
       data["eod-bushels"], // eod bush
       data["eod-ungraded-boxes"], // ungraded boxes
@@ -121,15 +119,13 @@ export async function submitEoDBreakdownToSheets(formData: FormData) {
       data["sold-male-md"],
       data["sold-male-ml"],
       data["sold-male-lg"],
-      data["sold-male-xl"],
-      data["sold-male-jumbo"],
+      data["sold-male-xlj"],
       data["sold-male-super"],
       data["sold-bushel-1's"],
       data["sold-bushel-2's"],
       data["sold-female-regf"],
       data["sold-female-lgf"],
-      data["sold-female-xlf"],
-      data["sold-female-jumbof"],
+      data["sold-female-xljf"],
     ];
 
     await sheets.spreadsheets.values.append({

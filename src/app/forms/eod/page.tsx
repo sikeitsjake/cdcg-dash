@@ -47,8 +47,8 @@ export default function EoDSalesBreakdown() {
     "Windy",
     "Thunderstorm",
   ];
-  const MALE_SIZES = ["SM", "MD", "ML", "LG", "XL", "JUMBO", "SUPER"];
-  const FEMALE_SIZES = ["REGF", "LGF", "XLF", "JUMBOF"];
+  const MALE_SIZES = ["SM", "MD", "ML", "LG", "XLJ", "SUPER"];
+  const FEMALE_SIZES = ["REGF", "LGF", "XLJF"];
 
   const updateCrabCount = (name: string, value: string) => {
     setCrabCounts((prev) => ({ ...prev, [name]: value }));
@@ -223,6 +223,7 @@ export default function EoDSalesBreakdown() {
         </div>
 
         {/* 2. Remaining Inventory */}
+        {/* 2. Remaining Inventory */}
         <Card className="border-2 border-primary/10 bg-card/50 backdrop-blur-sm">
           <CardHeader>
             <CardTitle className="text-lg font-bold flex items-center gap-2">
@@ -238,7 +239,7 @@ export default function EoDSalesBreakdown() {
                 </span>
                 <Separator className="flex-1 opacity-50" />
               </div>
-              <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-4">
+              <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-4">
                 {MALE_SIZES.map((size) => (
                   <div key={size} className="space-y-1.5">
                     <Label className="text-[10px] font-bold text-muted-foreground">
@@ -255,6 +256,7 @@ export default function EoDSalesBreakdown() {
                 ))}
               </div>
             </div>
+
             <div className="space-y-3">
               <div className="flex items-center gap-2">
                 <span className="text-[10px] font-black uppercase tracking-widest text-pink-500/50">
@@ -262,7 +264,7 @@ export default function EoDSalesBreakdown() {
                 </span>
                 <Separator className="flex-1 bg-pink-500/20" />
               </div>
-              <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-4">
+              <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-4">
                 {FEMALE_SIZES.map((size) => (
                   <div key={size} className="space-y-1.5">
                     <Label className="text-[10px] font-bold text-pink-500">
@@ -279,6 +281,7 @@ export default function EoDSalesBreakdown() {
                 ))}
               </div>
             </div>
+
             <Separator className="bg-primary/10" />
             <div className="grid grid-cols-2 max-w-md gap-4">
               <div className="space-y-2">
@@ -343,6 +346,7 @@ export default function EoDSalesBreakdown() {
                 ))}
               </div>
             </div>
+
             <Separator className="bg-primary/5" />
             <div className="space-y-3">
               <h3 className="text-xs font-black uppercase tracking-widest text-pink-500/70">
@@ -371,6 +375,7 @@ export default function EoDSalesBreakdown() {
                 ))}
               </div>
             </div>
+
             <Separator className="bg-primary/5" />
             <div className="space-y-3">
               <h3 className="text-xs font-black uppercase tracking-widest text-blue-500/70">
@@ -396,6 +401,7 @@ export default function EoDSalesBreakdown() {
                 ))}
               </div>
             </div>
+
             <div className="grid grid-cols-2 gap-4 pt-4 border-t border-primary/10">
               <div className="p-4 rounded-xl bg-primary/5 border border-primary/10 backdrop-blur-md">
                 <Label className="text-[10px] uppercase font-bold text-muted-foreground">
