@@ -14,3 +14,10 @@ Here is a non-exhaustive list of what you can do with the CDCG Dashboard
 - **Metrics at a Glance:** The main home page houses multipe widgets such as local weather, estimated clock-in time, and much more
 - **Business Form Hub:** Looking for a form? All of the forms are consolidated down into one searchable hub! Find any data entry form in seconds!
 
+## 🛠️Setup
+Follow the below steps to get the cdcg dash running locally in a development environment
+- clone the repo: git clone <repo link>
+- run npm install to install all dependencies (Node.js required)
+- setup the .env.local file with a google service account email, a google private key, and the google sheet id
+- Once all env variables are in place, run npm run dev to start a local instance of the application.
+
