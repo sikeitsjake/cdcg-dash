@@ -30,20 +30,20 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
+# env files
 .env*
+!.env.example
 
 # vercel
 .vercel
 
 # typescript
 *.tsbuildinfo
-next-env.d.ts
 
 # hash-function
 /scripts
 
 # cache files
-.eslintcashe
-.styleincashe
+.eslintcache
+.stylelintcache
 /src/generated/prisma
