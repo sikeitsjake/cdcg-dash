@@ -113,8 +113,8 @@ GOOGLE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\
 GOOGLE_SERVICE_ACCOUNT_EMAIL="your-service-account@your-project.iam.gserviceaccount.com"
 GOOGLE_SHEET_ID="your-google-sheet-id"
 STAFF_JSON={"Employee Name":"$2a$10$...bcrypthash..."}
-LAT=39.9526
-LON=-75.1652
+LAT=
+LON=
 ```
 
 ### 5. Run the app locally
