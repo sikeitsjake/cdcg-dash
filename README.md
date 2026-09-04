@@ -173,14 +173,7 @@ https://docs.google.com/spreadsheets/d/<THIS_IS_THE_SHEET_ID>/edit
 
 ### LAT and LON
 
-These are used by the dashboard to fetch local weather using Open-Meteo.
-
-Example:
-
-```env
-LAT=39.9526
-LON=-75.1652
-```
+These are used by the dashboard to fetch local weather using Open-Meteo. These should be set to the location of any given store.
 
 ### STAFF_JSON
 
